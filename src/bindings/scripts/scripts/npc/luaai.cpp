@@ -3,6 +3,7 @@
 #include "../../../../game/World.h"
 #include "../../../../game/Object.h"
 #include <pthread.h>
+#include <vector>
 #include "escort_ai.h"
 
 extern "C"
@@ -88,6 +89,7 @@ Player* L_Unit2Player ( Unit* u )
         return ( Player* ) u;
 
 }
+
 ScriptedInstance * L_InstanceData2ScriptedInstance( InstanceData * i )
 {
   return (ScriptedInstance*)i;
@@ -116,14 +118,14 @@ void lua_sysmsg(const char * message)
 #define UNLOCK pthread_mutex_unlock(&lock)
 #define RESET_ENTER resetting = true;
 #define RESET_LEAVE resetting = false;
-struct TRINITY_DLL_DECL LuaAI : public npc_escortAI
+struct TRINITY_DLL_DECL LuaAI : public ScriptedAI
 {
 public:
     lua_State * L;
     pthread_mutex_t lock;
     bool lockcreated;
     bool resetting;
-    LuaAI ( Creature *c ) : npc_escortAI ( c )
+    LuaAI ( Creature *c ) : ScriptedAI ( c )
     {
         L = NULL;
         lockcreated = false;
@@ -145,6 +147,42 @@ public:
         if ( lockcreated )
             pthread_mutex_destroy ( &lock );
 
+    }
+    void CallLuaFunctionOnOtherAI( Creature * c,std::string function, std::string param )
+    {
+      if ( !c )
+      {
+        return;
+      }
+      if ( c == m_creature )
+      {
+        return;
+      }
+      CreatureAI * cAI = c->AI();
+      if ( c->GetScriptName() == "luaai" )
+      {
+        LuaAI * lAI = (LuaAI*)cAI;
+        if ( ! lAI->L )
+        {
+          sLog.outError("Il lua sull'npc '%s' ( GUID : %llu , Entry : %d ) non è inizializzato, impossibile chiamare la funzione",c->GetName(),c->GetGUID(),c->GetEntry());
+          return;
+        }
+        try{
+          luabind::call_function<void> (lAI->L,function.c_str(),param);
+        }catch ( luabind::error e )
+        {
+            sLog.outError("Impossibile chiamare la funzione '%s' sull'AI Lua dell'npc '%s' con GUID %llu con entry %d : %s",function.c_str(),c->GetName(),c->GetGUID(),c->GetEntry(),GetLuaError ( lAI->L )); 
+        }
+        catch ( luabind::cast_failed e )
+        {
+            std::cout << "ERRORE LUA: " << e.what() << std::endl;
+        }
+        
+      }else{
+        sLog.outError("L'npc '%s' ( GUID : %llu , Entry : %d ) non ha una AI 'luaai' ma una ai '%s', impossibile chiamare la funzione",c->GetName(),c->GetGUID(),c->GetEntry(),c->GetAIName());
+      }
+      
+      
     }
     void ReloadLUA()
     {
@@ -197,14 +235,14 @@ public:
             .def ( "GetGUID" , &ScriptedAI::GetGUID )
             .def ( "DoModifyThreatPercent", &ScriptedAI::DoModifyThreatPercent )
             ,
-            luabind::class_<npc_escortAI,ScriptedAI> ( "npc_escortAI" ),
             luabind::class_<HostilReference> ("HostilReference" )
               .def ( "getUnitGuid", &HostilReference::getUnitGuid )
               ,
-            luabind::class_<LuaAI,npc_escortAI> ( "LuaAI" )
+            luabind::class_<LuaAI,ScriptedAI> ( "LuaAI" )
             .def ( "SelectUnit", &LuaAI::L_SelectUnit )
             .def ( "SelectUnit2", &LuaAI::L_SelectUnit2 )
             .def ( "UpdateVictim" , &LuaAI::L_UpdateVictim )
+            .def ( "CallLuaFunctionOnOtherAI" , &LuaAI::CallLuaFunctionOnOtherAI)
             .def ( "EnterEvadeMode" , &LuaAI::L_EnterEvadeMode ),
             luabind::class_<Item> ( "Item" ),
             luabind::class_<Aura> ( "Aura" ),
