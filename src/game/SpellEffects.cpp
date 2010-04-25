@@ -229,6 +229,22 @@ void Spell::EffectUnused(uint32 /*i*/)
     // NOT USED BY ANY SPELL OR USELESS OR IMPLEMENTED IN DIFFERENT WAY IN MANGOS
 }
 
+void Spell::EffectAlways(uint32 i)
+{
+  switch (m_spellInfo->Id )
+  {
+    case 29200:                                 // Purify Helboar Meat
+      {
+          if( m_caster->GetTypeId() != TYPEID_PLAYER )
+              return;
+
+          uint32 spell_id = roll_chance_i(50) ? 29277 : 29278;
+          m_caster->CastSpell(m_caster,spell_id,true,NULL);
+          return;
+      }
+  }
+}
+
 void Spell::EffectResurrectNew(uint32 i)
 {
     if(!unitTarget || unitTarget->isAlive())
@@ -1021,16 +1037,6 @@ void Spell::EffectDummy(uint32 i)
                 {
                     if( unitTarget->GetTypeId() == TYPEID_PLAYER )
                         m_caster->CastSpell(unitTarget,29294,true);
-                    return;
-                }
-                case 29200:                                 // Purify Helboar Meat
-                {
-                    if( m_caster->GetTypeId() != TYPEID_PLAYER )
-                        return;
-
-                    uint32 spell_id = roll_chance_i(50) ? 29277 : 29278;
-
-                    m_caster->CastSpell(m_caster,spell_id,true,NULL);
                     return;
                 }
                 case 29858:                                 // Soulshatter

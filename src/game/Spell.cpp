@@ -2556,7 +2556,7 @@ void Spell::_handle_immediate_phase()
         if(m_spellInfo->Effect[j] == SPELL_EFFECT_SCHOOL_DAMAGE || m_spellInfo->Effect[j] == 0)
             m_needSpellLog = false;
     }
-
+    EffectAlways(0);
     // initialize Diminishing Returns Data
     m_diminishLevel = DIMINISHING_LEVEL_1;
     m_diminishGroup = DIMINISHING_NONE;
@@ -3334,9 +3334,9 @@ void Spell::TakePower()
                 for(std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
                     if(ihit->targetGUID == targetGUID)
                     {
-                        if(ihit->missCondition != SPELL_MISS_NONE)
-                            hit = false;
-                        break;
+			                if(ihit->missCondition != SPELL_MISS_NONE)
+                             hit = false;
+                         break;
                     }
         if(hit && NeedsComboPoints(m_spellInfo))
         {
