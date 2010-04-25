@@ -171,6 +171,22 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
             }
 
             Spell *spell = new Spell(pUser, spellInfo, (count > 0));
+            if ( pItem->GetEntry() == 29513 )//La spell è completamente buggata , il client non manda il target, bisogna procurarselo manualmente con un hack
+            {
+              if ( spellInfo->Id == 35460 )
+              {
+                uint64 selected = pUser->GetSelection();
+                Unit * Target = ObjectAccessor::GetUnit(*pUser,selected);
+                if ( Target && Target->GetTypeId() == TYPEID_UNIT && Target->GetEntry() == 19354 )
+                {
+                  targets.setUnitTarget(Target);
+                }else{
+                  pUser->GetSession()->SendNotification("Staff of the Dreghood Elders must be used on Arzeth the Merciless");
+                  continue;
+                }
+                
+              }
+            }
             spell->m_CastItem = pItem;
             spell->m_cast_count = cast_count;               //set count of casts
             spell->prepare(&targets);

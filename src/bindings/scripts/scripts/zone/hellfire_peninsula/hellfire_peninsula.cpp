@@ -375,6 +375,55 @@ bool QuestAccept_npc_wounded_blood_elf(Player* pPlayer, Creature* pCreature, Que
     return true;
 }
 
+
+struct TRINITY_DLL_DECL mob_arzeth_the_mercilessAI : public ScriptedAI
+{
+    mob_arzeth_the_mercilessAI(Creature *c) : ScriptedAI(c) {}
+
+    uint32 ChannelTimer;
+    bool Channeled;
+    bool Hitted;
+
+    void Reset()
+    {
+        ChannelTimer = 0;
+        Channeled = false;
+        Hitted = false;
+    }
+
+    void EnterCombat(Unit *who){}
+
+    void SpellHit(Unit* caster, const SpellEntry* spell)
+    {
+        if(!caster)
+            return;
+        if(caster->GetTypeId() == TYPEID_PLAYER && spell->Id == 35460)
+        {
+            ChannelTimer = 2000;
+            Hitted = true;
+        }
+    }
+
+    void UpdateAI(const uint32 diff)
+    {
+        if(ChannelTimer < diff && !Channeled && Hitted)
+        {
+            m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+            m_creature->RemoveCorpse();
+            m_creature->SummonCreature(20680 /*Arzeth the powerless*/, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 180000);
+            Channeled = true;
+        }else ChannelTimer -= diff;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_mob_arzeth_the_merciless(Creature *_Creature)
+{
+  mob_arzeth_the_mercilessAI * ai = new mob_arzeth_the_mercilessAI(_Creature);
+  return (CreatureAI*)ai;
+}
+
 /*######
 ##
 ######*/
@@ -415,6 +464,11 @@ void AddSC_hellfire_peninsula()
     newscript->Name="npc_wounded_blood_elf";
     newscript->GetAI = &GetAI_npc_wounded_blood_elf;
     newscript->pQuestAccept = &QuestAccept_npc_wounded_blood_elf;
+    newscript->RegisterSelf();
+    
+    newscript = new Script;
+    newscript->Name="mob_arzeth_the_merciless";
+    newscript->GetAI = &GetAI_mob_arzeth_the_merciless;
     newscript->RegisterSelf();
 }
 
