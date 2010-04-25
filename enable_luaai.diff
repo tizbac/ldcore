@@ -1,0 +1,63 @@
+diff -r d70f71bc217f src/bindings/scripts/CMakeLists.txt
+--- a/src/bindings/scripts/CMakeLists.txt	Wed Feb 17 10:08:30 2010 +0100
++++ b/src/bindings/scripts/CMakeLists.txt	Wed Feb 17 10:39:17 2010 +0100
+@@ -1,3 +1,5 @@
++include_directories( ../boost_1_42_0/ ../luabind-0.9 ../lua5.1/src)
++link_directories( ../luabind-0.9 ../lua5.1/lib/Linux26g4_64)
+ 
+ ########### next target ###############
+ 
+@@ -32,6 +34,7 @@
+    scripts/npc/npc_innkeeper.cpp
+    scripts/npc/npc_professions.cpp
+    scripts/npc/npcs_special.cpp
++   scripts/npc/luaai.cpp
+    scripts/zone/arathi_highlands/arathi_highlands.cpp
+    scripts/zone/alterac_valley/boss_balinda.cpp
+    scripts/zone/alterac_valley/boss_drekthar.cpp
+@@ -408,7 +411,7 @@
+     SET_TARGET_PROPERTIES(trinityscript PROPERTIES LINK_FLAGS "-flat_namespace -undefined suppress")
+ ENDIF (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+ 
+-target_link_libraries(trinityscript)
++target_link_libraries(trinityscript lua5.1 luabind)
+ 
+ set_target_properties(trinityscript PROPERTIES VERSION 4.2.0 SOVERSION 4)
+ install(TARGETS trinityscript DESTINATION lib)
+diff -r d70f71bc217f src/bindings/scripts/system/ScriptLoader.cpp
+--- a/src/bindings/scripts/system/ScriptLoader.cpp	Wed Feb 17 10:08:30 2010 +0100
++++ b/src/bindings/scripts/system/ScriptLoader.cpp	Wed Feb 17 10:39:17 2010 +0100
+@@ -40,6 +40,7 @@
+ extern void AddSC_npc_professions();
+ extern void AddSC_npcs_special();
+ extern void AddSC_npc_innkeeper();
++extern void AddSC_LuaAI();
+ 
+ // -- Servers --
+ 
+@@ -608,6 +609,7 @@
+     AddSC_npc_professions();
+     AddSC_npcs_special();
+     AddSC_npc_innkeeper();
++    AddSC_LuaAI();
+ 
+     // -- Servers --
+ 
+diff -r d70f71bc217f src/trinitycore/CMakeLists.txt
+--- a/src/trinitycore/CMakeLists.txt	Wed Feb 17 10:08:30 2010 +0100
++++ b/src/trinitycore/CMakeLists.txt	Wed Feb 17 10:39:17 2010 +0100
+@@ -1,3 +1,5 @@
++include_directories( ../bindings/boost_1_42_0/ ../bindings/luabind-0.9 ../bindings/lua5.1/src)
++link_directories( ../bindings/luabind-0.9 ../bindings/lua5.1/lib/Linux26g4_64)
+ 
+ ########### next target ###############
+ 
+@@ -44,6 +46,8 @@
+ trinitydatabase
+ trinityauth
+ trinityconfig
++lua5.1
++luabind
+ vmaps
+ ZThread
+ g3dlite

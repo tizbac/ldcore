@@ -1,0 +1,2 @@
+/usr/bin/ar cr libtrinityconfig.a  CMakeFiles/trinityconfig.dir/dotconfpp/dotconfpp.cpp.o CMakeFiles/trinityconfig.dir/dotconfpp/mempool.cpp.o CMakeFiles/trinityconfig.dir/Config.cpp.o 
+/usr/bin/ranlib libtrinityconfig.a 

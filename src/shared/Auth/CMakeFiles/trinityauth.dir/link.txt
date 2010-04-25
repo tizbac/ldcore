@@ -1,0 +1,2 @@
+/usr/bin/ar cr libtrinityauth.a  CMakeFiles/trinityauth.dir/AuthCrypt.cpp.o CMakeFiles/trinityauth.dir/BigNumber.cpp.o CMakeFiles/trinityauth.dir/Hmac.cpp.o CMakeFiles/trinityauth.dir/Sha1.cpp.o CMakeFiles/trinityauth.dir/md5.c.o 
+/usr/bin/ranlib libtrinityauth.a 

@@ -1,0 +1,2 @@
+/usr/bin/ar cr libtrinityframework.a  CMakeFiles/trinityframework.dir/Policies/ObjectLifeTime.cpp.o CMakeFiles/trinityframework.dir/Utilities/EventProcessor.cpp.o 
+/usr/bin/ranlib libtrinityframework.a 
