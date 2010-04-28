@@ -460,7 +460,41 @@ struct TRINITY_DLL_DECL npc_dirty_larryAI : public ScriptedAI
             Malone->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
     }
-
+    void DamageTaken ( Unit* pDone_by,uint32 &dmg)
+    {
+      if((((m_creature->GetHealth())-dmg)*100)/m_creature->GetMaxHealth() < 1 && !Done)
+      {
+          Unit* Creepjack = FindCreature(NPC_CREEPJACK, 20, m_creature);
+          if(Creepjack)
+          {
+              ((Creature*)Creepjack)->AI()->EnterEvadeMode();
+              Creepjack->setFaction(1194);
+              Creepjack->GetMotionMaster()->MoveTargetedHome();
+              Creepjack->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+          }
+          Unit* Malone = FindCreature(NPC_MALONE, 20, m_creature);
+          if(Malone)
+          {
+              ((Creature*)Malone)->AI()->EnterEvadeMode();
+              Malone->setFaction(1194);
+              Malone->GetMotionMaster()->MoveTargetedHome();
+              Malone->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+          }
+          m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+          m_creature->setFaction(1194);
+          Done = true;
+          DoScriptText(SAY_GIVEUP, m_creature, NULL);
+          m_creature->DeleteThreatList();
+          m_creature->CombatStop();
+          m_creature->GetMotionMaster()->MoveTargetedHome();
+          Player* player = Unit::GetPlayer(PlayerGUID);
+          if(player)
+              player->GroupEventHappens(QUEST_WBI, m_creature);
+          dmg = 0;// Annulla il danno
+      }
+      
+      
+    }
     uint32 NextStep(uint32 Step)
     {
         Player* player = Unit::GetPlayer(PlayerGUID);
@@ -524,35 +558,7 @@ struct TRINITY_DLL_DECL npc_dirty_larryAI : public ScriptedAI
             Attack = false;
         }
 
-        if((m_creature->GetHealth()*100)/m_creature->GetMaxHealth() < 1 && !Done)
-        {
-            Unit* Creepjack = FindCreature(NPC_CREEPJACK, 20, m_creature);
-            if(Creepjack)
-            {
-                ((Creature*)Creepjack)->AI()->EnterEvadeMode();
-                Creepjack->setFaction(1194);
-                Creepjack->GetMotionMaster()->MoveTargetedHome();
-                Creepjack->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            }
-            Unit* Malone = FindCreature(NPC_MALONE, 20, m_creature);
-            if(Malone)
-            {
-                ((Creature*)Malone)->AI()->EnterEvadeMode();
-                Malone->setFaction(1194);
-                Malone->GetMotionMaster()->MoveTargetedHome();
-                Malone->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            }
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            m_creature->setFaction(1194);
-            Done = true;
-            DoScriptText(SAY_GIVEUP, m_creature, NULL);
-            m_creature->DeleteThreatList();
-            m_creature->CombatStop();
-            m_creature->GetMotionMaster()->MoveTargetedHome();
-            Player* player = Unit::GetPlayer(PlayerGUID);
-            if(player)
-                player->GroupEventHappens(QUEST_WBI, m_creature);
-        }
+        
         DoMeleeAttackIfReady();
     }
 };
@@ -728,4 +734,5 @@ void AddSC_shattrath_city()
     newscript->pGossipSelect = &GossipSelect_npc_khadgar;
     newscript->RegisterSelf();
 }
+
 
