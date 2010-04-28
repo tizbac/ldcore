@@ -885,7 +885,7 @@ struct TRINITY_DLL_DECL boss_kaelthasAI : public ScriptedAI
                         {
                             //Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 0);
                             //DoCast(target, SPELL_PYROBLAST);
-                            m_creature->CastSpell(m_creature->getVictim(), SPELL_PYROBLAST, false);                     
+                            m_creature->CastSpell(SelectUnit(SELECT_TARGET_TOPAGGRO, 0), SPELL_PYROBLAST, false);                     
                             ++PyrosCasted;
 
                             Check_Timer = 4400;
