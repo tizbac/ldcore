@@ -36,7 +36,11 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 
     uint32 talent_id, requested_rank;
     recv_data >> talent_id >> requested_rank;
-
+    if (GetPlayer()->getDeathState() != ALIVE )
+    {
+        SendNotification("Cannot change talents while dead!");
+        return;
+    }
     uint32 CurTalentPoints =  GetPlayer()->GetFreeTalentPoints();
 
     if(CurTalentPoints == 0)
