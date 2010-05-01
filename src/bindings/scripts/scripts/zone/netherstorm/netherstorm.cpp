@@ -821,6 +821,14 @@ struct TRINITY_DLL_DECL mob_phase_hunterAI : public ScriptedAI
     void SpellHit(Unit *caster, const SpellEntry *spell)
     {
         DoCast(m_creature, SPELL_DE_MATERIALIZE);
+        if (!caster)
+          return;
+        if ( spell->Id == 34219 && caster->GetTypeId() == TYPEID_PLAYER && float(m_creature->GetHealth())/float(m_creature->GetMaxHealth()) < 0.20 )
+        {
+           m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+           m_creature->RemoveCorpse();
+           m_creature->SummonCreature(19595, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 180000);
+        }
     }
 
     void UpdateAI(const uint32 diff)
