@@ -1263,7 +1263,7 @@ void Aura::TriggerSpell()
     // generic casting code with custom spells and target/caster customs
     uint32 trigger_spell_id = GetSpellProto()->EffectTriggerSpell[m_effIndex];
 
-    uint64 originalCasterGUID = GetCasterGUID();
+    uint64 originalCasterGUID = GetCaster()->GetGUID();
 
     SpellEntry const *triggeredSpellInfo = sSpellStore.LookupEntry(trigger_spell_id);
     SpellEntry const *auraSpellInfo = GetSpellProto();
@@ -1986,15 +1986,15 @@ void Aura::TriggerSpell()
     }
     if(!GetSpellMaxRange(sSpellRangeStore.LookupEntry(triggeredSpellInfo->rangeIndex)))
         target = m_target;    //for druid dispel poison
-    m_target->CastSpell(target, triggeredSpellInfo, true, 0, this, originalCasterGUID);
+    GetCaster()->CastSpell(target, triggeredSpellInfo, true, 0, this, originalCasterGUID);
 }
 
 Unit* Aura::GetTriggerTarget() const
 {
-    Unit* target = ObjectAccessor::GetUnit(*m_target,
+    Unit* target = ObjectAccessor::GetUnit(*GetCaster(),
         /*m_target->GetTypeId()==TYPEID_PLAYER ?
         ((Player*)m_target)->GetSelection() :*/
-        m_target->GetUInt64Value(UNIT_FIELD_TARGET));
+        GetCaster()->GetUInt64Value(UNIT_FIELD_TARGET));
     return target ? target : m_target;
 }
 
