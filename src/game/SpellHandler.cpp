@@ -170,7 +170,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
                 continue;
             }
 
-            Spell *spell = new Spell(pUser, spellInfo, (count > 0));
+            
             if ( pItem->GetEntry() == 29513 )//La spell è completamente buggata , il client non manda il target, bisogna procurarselo manualmente con un hack
             {
               if ( spellInfo->Id == 35460 )
@@ -187,6 +187,25 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
                 
               }
             }
+            if ( (pItem->GetEntry() == 24268 || pItem->GetEntry() == 24269) && ( spellInfo->Id == 31367 || spellInfo->Id == 31368 ) )// Netherweave net , stesso bug della spell sopra
+            {
+              uint64 selected = pUser->GetSelection();
+              Unit * Target = ObjectAccessor::GetUnit(*pUser,selected);
+              if ( Target )
+              {
+                if ( pUser->canAttack(Target) )
+                {
+                  targets.setUnitTarget(Target);
+                }else{
+                  pUser->GetSession()->SendNotification("Invalid Target");
+                  continue;
+                }
+              }else{
+                pUser->GetSession()->SendNotification("No target selected");
+                continue;
+              }
+            }
+            Spell *spell = new Spell(pUser, spellInfo, (count > 0));
             spell->m_CastItem = pItem;
             spell->m_cast_count = cast_count;               //set count of casts
             spell->prepare(&targets);
