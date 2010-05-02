@@ -26,7 +26,7 @@ src/trinityrealm/trinity-realm
 *.so
 genrev
 CMakeFiles
-CMakeCache.txt
+CMakeCahce.txt
 
 # use regexp syntax.
 syntax: regexp
