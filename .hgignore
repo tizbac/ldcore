@@ -16,9 +16,15 @@ dep/lib/win32*
 src/bindings/scripts/VC90/*/
 src/mangosd/
 src/realmd/
+src/trinitycore/trinity-core
+src/trinityrealm/trinity-realm
 *.*-*
 *.o
+*.a
 *.cmake
+*.so.*
+*.so
+genrev
 CMakeFiles
 CMakeCache.txt
 
