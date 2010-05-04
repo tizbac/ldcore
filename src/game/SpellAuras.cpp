@@ -1986,7 +1986,7 @@ void Aura::TriggerSpell()
     }
     if(!GetSpellMaxRange(sSpellRangeStore.LookupEntry(triggeredSpellInfo->rangeIndex)))
         target = m_target;    //for druid dispel poison
-    if (GetCaster())
+    if ( GetCaster() )
     {
       GetCaster()->CastSpell(target, triggeredSpellInfo, true, 0, this, originalCasterGUID);
     }else{
@@ -1997,12 +1997,12 @@ void Aura::TriggerSpell()
 Unit* Aura::GetTriggerTarget() const
 {
     Unit * target = NULL;
-    if (GetCaster())
+    if ( GetCaster() )//Non ho parole....
     {
-      Unit* target = ObjectAccessor::GetUnit(*GetCaster(),
-          /*m_target->GetTypeId()==TYPEID_PLAYER ?
-          ((Player*)m_target)->GetSelection() :*/
-          GetCaster()->GetUInt64Value(UNIT_FIELD_TARGET));
+      target = ObjectAccessor::GetUnit(*GetCaster(),
+        /*m_target->GetTypeId()==TYPEID_PLAYER ?
+        ((Player*)m_target)->GetSelection() :*/
+        GetCaster()->GetUInt64Value(UNIT_FIELD_TARGET));
     }
     return target ? target : m_target;
 }
