@@ -246,7 +246,16 @@ bool GossipSelect_npc_wing_commander_brack(Player *player, Creature *_Creature, 
         break;
     case GOSSIP_ACTION_INFO_DEF + 2:
         player->CLOSE_GOSSIP_MENU();
-        player->CastSpell(player,33825,true);               //TaxiPath 587 (Aerial Assault Flight (Horde))
+        player->CastSpell(player,33825,true);     
+	if (player->GetQuestStatus(10162) == QUEST_STATUS_INCOMPLETE)
+        {
+            SpellEntry *TempSpell =(SpellEntry*)GetSpellStore()->LookupEntry(33824);
+            if(!TempSpell)
+                return true;
+            TempSpell->Effect[0]=0;
+            TempSpell->Effect[1]=0;
+            player->CastSpell(player,33824,false);
+        }          //TaxiPath 587 (Aerial Assault Flight (Horde))
         break;
     case GOSSIP_ACTION_INFO_DEF + 3:
         player->CLOSE_GOSSIP_MENU();

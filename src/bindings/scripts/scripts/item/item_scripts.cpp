@@ -489,6 +489,22 @@ bool ItemUse_item_zezzak_shard(Player *player, Item* _Item, SpellCastTargets con
     return true;
 }
 
+/*#####
+# item_stormcrow_amulet
+#####*/
+
+bool ItemUse_item_stormcrow_amulet(Player *player, Item* _Item, SpellCastTargets const& targets)
+{
+    if (player->GetQuestStatus(9718) == QUEST_STATUS_INCOMPLETE)
+    {
+        player->CastSpell(player, 31606, false);
+        //
+        player->CompleteQuest(9718);
+        return true;
+    }
+    return false;
+}
+
 void AddSC_item_scripts()
 {
     Script *newscript;
@@ -591,6 +607,11 @@ void AddSC_item_scripts()
     newscript = new Script;
     newscript->Name="item_zezzaks_shard";
     newscript->pItemUse = &ItemUse_item_zezzak_shard;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name="item_stormcrow_amulet";
+    newscript->pItemUse = &ItemUse_item_stormcrow_amulet;
     newscript->RegisterSelf();
 }
 
