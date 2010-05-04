@@ -1986,15 +1986,24 @@ void Aura::TriggerSpell()
     }
     if(!GetSpellMaxRange(sSpellRangeStore.LookupEntry(triggeredSpellInfo->rangeIndex)))
         target = m_target;    //for druid dispel poison
-    GetCaster()->CastSpell(target, triggeredSpellInfo, true, 0, this, originalCasterGUID);
+    if (GetCaster())
+    {
+      GetCaster()->CastSpell(target, triggeredSpellInfo, true, 0, this, originalCasterGUID);
+    }else{
+      m_target->CastSpell(target, triggeredSpellInfo, true, 0, this, originalCasterGUID);
+    }
 }
 
 Unit* Aura::GetTriggerTarget() const
 {
-    Unit* target = ObjectAccessor::GetUnit(*GetCaster(),
-        /*m_target->GetTypeId()==TYPEID_PLAYER ?
-        ((Player*)m_target)->GetSelection() :*/
-        GetCaster()->GetUInt64Value(UNIT_FIELD_TARGET));
+    Unit * target = NULL;
+    if (GetCaster())
+    {
+      Unit* target = ObjectAccessor::GetUnit(*GetCaster(),
+          /*m_target->GetTypeId()==TYPEID_PLAYER ?
+          ((Player*)m_target)->GetSelection() :*/
+          GetCaster()->GetUInt64Value(UNIT_FIELD_TARGET));
+    }
     return target ? target : m_target;
 }
 
