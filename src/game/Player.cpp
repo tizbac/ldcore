@@ -10314,6 +10314,8 @@ uint8 Player::CanUseItem( Item *pItem, bool not_loading ) const
                 return EQUIP_ERR_CANT_EQUIP_REPUTATION;
             if( getLevel() < pProto->RequiredLevel )
                 return EQUIP_ERR_CANT_EQUIP_LEVEL_I;
+            if( pItem->GetUInt32Value(ITEM_FIELD_DURABILITY) < 1)
+                return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;
             return EQUIP_ERR_OK;
         }
     }

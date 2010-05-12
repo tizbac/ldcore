@@ -90,8 +90,9 @@ void WorldSession::HandleSwapInvItemOpcode( WorldPacket & recv_data )
         return;
     }
 
-    if (_player->IsCastingSpell())
-        _player->SendEquipError(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, NULL, NULL );
+    //TANKK Testing...
+    //if (_player->IsCastingSpell())
+    //    _player->SendEquipError(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, NULL, NULL );
 
     uint16 src = ( (INVENTORY_SLOT_BAG_0 << 8) | srcslot );
     uint16 dst = ( (INVENTORY_SLOT_BAG_0 << 8) | dstslot );
@@ -148,8 +149,9 @@ void WorldSession::HandleSwapItem( WorldPacket & recv_data )
         return;
     }
 
-    if (_player->IsCastingSpell())
-        _player->SendEquipError(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, NULL, NULL );
+    //Testing...
+    //if (_player->IsCastingSpell())
+    //    _player->SendEquipError(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, NULL, NULL );
 
     _player->SwapItem( src, dst );
 }
