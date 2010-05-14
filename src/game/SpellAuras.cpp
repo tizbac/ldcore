@@ -362,6 +362,20 @@ m_canDualStack(false), m_forceSingleStack(false), m_tickNumber(0)
             m_forceSingleStack  = false;
             m_activeDualStack   = false;
             break;
+	//Wound Poison
+	case 27189:
+	//Sunder Armor Rk 1
+	case 7386:
+	//Sunder Armor Rk 2
+	case 7405:
+	//Sunder Armor Rk 3
+	case 8380:
+	//Sunder Armor Rk 4
+	case 11596:
+	//Sunder Armor Rk 5
+	case 11597:
+	//Sunder Armor Rk 6
+	case 25225:
         //Winter's Chill
         case 12579:
         //Improved Scorch
