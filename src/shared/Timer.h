@@ -47,6 +47,16 @@ inline uint32 getMSTime()
 }
 #endif
 
+inline double getTime()
+{
+  struct timeval t;
+  gettimeofday(&t,NULL);
+  double ti = 0.0;
+  ti = t.tv_sec;
+  ti += t.tv_usec/1000000.0;
+  return ti;
+}
+
 inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)
 {
     // getMSTime() have limited data range and this is case when it overflow in this tick
