@@ -28,7 +28,7 @@ struct luavec3
     float y;
     float z;
 };
-
+std::map< uint64, std::string > luaglobal;
 //Se è 32 Bit va definito questo tipo
 namespace luabind
 {
@@ -89,7 +89,13 @@ Player* L_Unit2Player ( Unit* u )
         return ( Player* ) u;
 
 }
-
+std::string L_GetLuaDir()
+{
+  return sWorld.GetDataPath()+"ai/";
+  
+  
+  
+}
 ScriptedInstance * L_InstanceData2ScriptedInstance( InstanceData * i )
 {
   return (ScriptedInstance*)i;
@@ -206,6 +212,7 @@ public:
             luabind::class_<uint64> ( "uint64" ),
             luabind::class_<UnitAI> ( "UnitAI" ),
             luabind::class_<CreatureAI,UnitAI> ( "CreatureAI" ),
+            
             luabind::class_<CleanDamage> ("CleanDamage"),
             luabind::class_<ScriptedAI,CreatureAI> ( "ScriptedAI" )
             .def ( "DoTeleportPlayer",&ScriptedAI::DoTeleportPlayer )
@@ -317,6 +324,28 @@ public:
               .def ( "getThreatList" , &ThreatManager::getThreatList, luabind::return_stl_iterator)
               ,
             luabind::class_<WorldSession> ( "WorldSession" ),
+            luabind::class_<MotionMaster> ( "MotionMaster" )
+            .def ( "MoveCharge" , &MotionMaster::MoveCharge )
+            .def ( "MoveChase" , &MotionMaster::MoveChase  )
+            .def ( "MoveConfused" , &MotionMaster::MoveConfused )
+            .def ( "MoveDistract" , &MotionMaster::MoveDistract )
+            .def ( "MoveFall" , &MotionMaster::MoveFall )
+            .def ( "MoveFleeing" , &MotionMaster::MoveFleeing )
+            .def ( "MoveFollow" , &MotionMaster::MoveFollow )
+            .def ( "MoveIdle" , &MotionMaster::MoveIdle )
+            .def ( "MoveJump" , &MotionMaster::MoveJump )
+            .def ( "MoveJumpTo" , &MotionMaster::MoveJumpTo )
+            .def ( "MovePath" , &MotionMaster::MovePath )
+            .def ( "MovePoint" , &MotionMaster::MovePoint )
+            .def ( "MoveRandom" , &MotionMaster::MoveRandom )
+            .def ( "MoveRotate" , &MotionMaster::MoveRotate )
+            .def ( "MoveSeekAssistance" , &MotionMaster::MoveSeekAssistance )
+            .def ( "MoveSeekAssistanceDistract" , &MotionMaster::MoveSeekAssistanceDistract )
+            .def ( "MoveTargetedHome" , &MotionMaster::MoveTargetedHome )
+            .def ( "MoveTaxiFlight" , &MotionMaster::MoveTaxiFlight )
+            .def ( "Clear" , &MotionMaster::Clear )
+
+            ,
             luabind::class_<PlayerMenu> ( "PlayerMenu" )
             .def ( "GetGossipMenu",&PlayerMenu::GetGossipMenu )
             .def ( "SendGossipMenu",&PlayerMenu::SendGossipMenu )
@@ -369,6 +398,7 @@ public:
             .def ( "GetName",&Creature::GetName )
             .def ( "CastSpell", ( void ( Creature::* ) ( Unit*,uint32,bool,Item*,Aura*,uint64 ) ) &Unit::CastSpell )
             .def ( "GetHealth",&Creature::GetHealth )
+            .def ( "HandleEmoteCommand", &Creature::HandleEmoteCommand )
             .def ( "GetMaxHealth",&Creature::GetMaxHealth )
             .def ( "SetHealth",&Creature::SetHealth )
             .def ( "SetMaxHealth",&Creature::SetMaxHealth )
@@ -378,6 +408,10 @@ public:
             .def ( "Mount",&Creature::Mount )
             .def ( "DealDamage",&Creature::DealDamage )
             .def ( "Kill",&Creature::Kill )
+            .def ( "Relocate", (void ( Creature::* )(float,float,float,float))&Creature::Relocate )
+            .def ( "StopMoving" , &Creature::StopMoving )
+            .def ( "GetMotionMaster", &Creature::GetMotionMaster )
+            .def ( "GetHomePosition", &Creature::GetHomePosition )
             .def ( "HasAuraType",&Creature::HasAuraType )
             .def ( "HasAura",&Creature::HasAura )
             .def ( "setFaction",&Creature::setFaction )
@@ -397,6 +431,7 @@ public:
             .def ( "RemoveAurasDueToSpell" , &Creature::RemoveAurasDueToSpell )
             .def ( "SetDisplayId", &Creature::SetDisplayId )
             .def ( "ResetPlayerDamageReq", &Creature::ResetPlayerDamageReq )
+            .def ( "SummonGameObject" , &Creature::SummonGameObject )
             .def ( "MonsterTextEmote",(void(Creature::*)(const char *,uint64,bool))&Creature::MonsterTextEmote),
             luabind::def ( "GetScriptedAI",&L_CastToScriptedAI ),
             luabind::def ( "GetLuaAI",&L_CastToLuaAI ),
@@ -405,11 +440,18 @@ public:
             luabind::def ( "GetScriptedInstance" , &L_InstanceData2ScriptedInstance),
             luabind::def ( "DoScriptText" , &DoScriptText),
             luabind::def ( "GetUnit" , &Unit::GetUnit),
-            luabind::def ( "SystemMessage", &lua_sysmsg)
-            
+            luabind::def ( "SystemMessage", &lua_sysmsg),
+            luabind::def ( "GetLuaDir", &L_GetLuaDir ),
+            luabind::def ( "GetClosestCreatureWithEntry" , &GetClosestCreatureWithEntry),
+            luabind::def ( "GetClosestDeadCreature" , &GetClosestDeadCreature),
+            luabind::def ( "GetCreature" , &ObjectAccessor::GetCreature ),
+            luabind::def ( "GetGameObject" , &ObjectAccessor::GetGameObject ),
+            luabind::def ( "GetPlayer" , &ObjectAccessor::GetPlayer ),
+            luabind::def ( "FindPlayerByName" , &ObjectAccessor::FindPlayerByName ),
+            luabind::def ( "GetUnit" , &ObjectAccessor::GetUnit )
             //def("DoZoneInCombat", &func)
         ];
-        
+       
         std::stringstream luaname;
         luaname << sWorld.GetDataPath() << "ai/" << m_creature->GetEntry() << ".lua";
         std::cout << "Caricamento file lua: " << luaname.str() << std::endl;
