@@ -10052,7 +10052,7 @@ int32 Unit::CalculateSpellDuration(SpellEntry const* spellProto, uint8 effect_in
 
     if (duration > 0)
     {
-        int32 mechanic = GetEffectMechanic(spellProto, effect_index);
+        int32 mechanic = GetEffectMechanic(spellProto, effect_index - 1);
         // Find total mod value (negative bonus)
         int32 durationMod_always = target->GetTotalAuraModifierByMiscValue(SPELL_AURA_MECHANIC_DURATION_MOD, mechanic);
         // Find max mod (negative bonus)
