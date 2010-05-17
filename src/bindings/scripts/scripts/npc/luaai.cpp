@@ -443,7 +443,7 @@ public:
             luabind::def ( "SystemMessage", &lua_sysmsg),
             luabind::def ( "GetLuaDir", &L_GetLuaDir ),
             luabind::def ( "GetClosestCreatureWithEntry" , &GetClosestCreatureWithEntry),
-            luabind::def ( "GetClosestDeadCreature" , &GetClosestDeadCreature),
+//            luabind::def ( "GetClosestDeadCreature" , &GetClosestDeadCreature),
             luabind::def ( "GetCreature" , &ObjectAccessor::GetCreature ),
             luabind::def ( "GetGameObject" , &ObjectAccessor::GetGameObject ),
             luabind::def ( "GetPlayer" , &ObjectAccessor::GetPlayer ),
