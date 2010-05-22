@@ -8874,6 +8874,12 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
     int32 DoneFlatBenefit = 0;
     int32 TakenFlatBenefit = 0;
 
+    if( GetTypeId()==TYPEID_UNIT )
+    {
+        if (((Creature*)this)->isPet())
+            DoneFlatBenefit += ((Pet*)this)->GetMeleeBonusDamage();
+    }
+
     // ..done (for creature type by mask) in taken
     AuraList const& mDamageDoneCreature = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_CREATURE);
     for(AuraList::const_iterator i = mDamageDoneCreature.begin();i != mDamageDoneCreature.end(); ++i)

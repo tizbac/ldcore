@@ -1964,10 +1964,12 @@ void Spell::EffectTriggerSpell(uint32 i)
             return;
         }
         // Priest Shadowfiend (34433) need apply mana gain trigger aura on pet
+        // Pet Entry 19668
         case 41967:
         {
             if (Unit *pet = m_caster->GetPet())
                 pet->CastSpell(pet, 28305, true);
+
             return;
         }
     }
@@ -6670,7 +6672,11 @@ void Spell::EffectStealBeneficialBuff(uint32 i)
                 SpellEntry const* spellInfo = sSpellStore.LookupEntry(j->first);
                 data << uint32(spellInfo->Id);       // Spell Id
                 data << uint8(0);                    // 0 - steals !=0 transfers
-                unitTarget->RemoveAurasDueToSpellBySteal(spellInfo->Id, j->second, m_caster);
+                //Hack Ghost Wolf
+                if(spellInfo->Id!=2645)
+                    unitTarget->RemoveAurasDueToSpellBySteal(spellInfo->Id, j->second, m_caster);
+                else
+                    unitTarget->RemoveAurasDueToSpell(spellInfo->Id);
             }
             m_caster->SendMessageToSet(&data, true);
         }

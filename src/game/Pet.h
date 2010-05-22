@@ -182,7 +182,9 @@ class Pet : public Creature
         void SetDuration(int32 dur) { m_duration = dur; }
 
         int32 GetBonusDamage() { return m_bonusdamage; }
+        int32 GetMeleeBonusDamage() { return m_meleeBonusdamage; }
         void SetBonusDamage(int32 damage) { m_bonusdamage = damage; }
+        void SetMeleeBonusDamage(int32 damage) { m_meleeBonusdamage = damage; }
 
         bool UpdateStats(Stats stat);
         bool UpdateAllStats();
@@ -248,6 +250,7 @@ class Pet : public Creature
         int32   m_duration;                                 // time until unsummon (used mostly for summoned guardians and not used for controlled pets)
         int32   m_loyaltyPoints;
         int32   m_bonusdamage;
+        int32   m_meleeBonusdamage;
         uint64  m_auraUpdateMask;
 
         DeclinedName *m_declinedname;
