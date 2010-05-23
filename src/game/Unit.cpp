@@ -8485,8 +8485,6 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
     switch (spellProto->SpellFamilyName)
     {
         case SPELLFAMILY_GENERIC:
-            fixedAmount = true;
-            break;
         case SPELLFAMILY_POTION:
             checkSpecialBonus = true;
             fixedAmount = true;
