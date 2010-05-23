@@ -143,6 +143,7 @@ public:
         else
             lockcreated = true;
         resetting = false;
+        SetCombatMovement(true);
         ReloadLUA();
     }
 
@@ -443,7 +444,7 @@ public:
             luabind::def ( "SystemMessage", &lua_sysmsg),
             luabind::def ( "GetLuaDir", &L_GetLuaDir ),
             luabind::def ( "GetClosestCreatureWithEntry" , &GetClosestCreatureWithEntry),
-//            luabind::def ( "GetClosestDeadCreature" , &GetClosestDeadCreature),
+            //luabind::def ( "GetClosestDeadCreature" , &GetClosestDeadCreature),
             luabind::def ( "GetCreature" , &ObjectAccessor::GetCreature ),
             luabind::def ( "GetGameObject" , &ObjectAccessor::GetGameObject ),
             luabind::def ( "GetPlayer" , &ObjectAccessor::GetPlayer ),
@@ -525,7 +526,7 @@ public:
         }
     }
 
-    void MoveInLineOfSight ( Unit * u )
+    /*void MoveInLineOfSight ( Unit * u )
     {
         if ( ! L )
             return;
@@ -541,7 +542,7 @@ public:
         {
             std::cout << "ERRORE LUA: " << e.what() << std::endl;
         }
-    }
+    }*/
 
     /*void EnterEvadeMode()
     {
