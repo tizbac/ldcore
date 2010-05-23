@@ -8017,6 +8017,8 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
         }
     }
 
+    float LvlPenalty = CalculateLevelPenalty(spellProto);
+
     switch(spellProto->SpellFamilyName)
     {
         case SPELLFAMILY_GENERIC:
@@ -8122,6 +8124,7 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
             else if (spellProto->Id == 31117 && spellProto->SpellIconID == 232)
             {
                 CastingTime = 6300;
+                LvlPenalty  = 1.0f;
             }
             // Corruption 93%
             else if ((spellProto->SpellFamilyFlags & 0x2LL) && spellProto->SpellIconID == 313)
@@ -8243,8 +8246,6 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
         default:
             break;
     }
-
-    float LvlPenalty = CalculateLevelPenalty(spellProto);
 
     // Spellmod SpellDamage
     //float SpellModSpellDamage = 100.0f;
