@@ -70,6 +70,12 @@ void PointMovementGenerator<T>:: Finalize(T &unit)
         unit.clearUnitState(UNIT_STAT_CHARGING | UNIT_STAT_JUMPING);
     if(arrived) // without this crash!
         MovementInform(unit);
+    for (int j = 0; j < 3; j++)
+    {
+        if(unit.m_delayTrigger[j] != 0 && unit.getVictim())
+            unit.CastSpell(unit.getVictim(), unit.m_delayTrigger[j], true, NULL, NULL, NULL);
+        unit.m_delayTrigger[j] = 0;
+    }
 }
 
 template<class T>

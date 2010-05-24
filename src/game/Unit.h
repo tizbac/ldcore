@@ -1248,7 +1248,7 @@ class TRINITY_DLL_SPEC Unit : public WorldObject
         int32 GetCurrentSpellCastTime(uint32 spell_id) const;
 
         Spell* m_currentSpells[CURRENT_MAX_SPELL];
-
+        uint32 m_delayTrigger[3];
         uint32 m_detectionCacheResetTimer;
         uint32 m_addDmgOnce;
         uint64 m_TotemSlot[MAX_TOTEM];

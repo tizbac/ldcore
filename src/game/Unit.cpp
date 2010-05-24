@@ -159,6 +159,10 @@ Unit::Unit()
     if (pthread_mutex_init(&mid,NULL) != 0)
         sLog.outError("Error creating mutex during Unit initialization");
 
+    m_delayTrigger[0] = 0;
+    m_delayTrigger[1] = 0;
+    m_delayTrigger[2] = 0;
+
     m_forceAttack = false;
     m_objectType |= TYPEMASK_UNIT;
     m_objectTypeId = TYPEID_UNIT;

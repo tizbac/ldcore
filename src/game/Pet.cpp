@@ -74,7 +74,7 @@ Pet::Pet(PetType type) : Creature()
     m_loyaltyTimer = 12000;
     m_duration = 0;
     m_bonusdamage = 0;
-
+    m_meleeBonusdamage = 0;
     m_loyaltyPoints = 0;
     m_TrainingPoints = 0;
     m_resetTalentsCost = 0;
@@ -379,20 +379,15 @@ bool Pet::LoadPetFromDB( Unit* owner, uint32 petentry, uint32 petnumber, bool cu
     if(summon_spell_id == 34433)
     {
         //0,06 bonus spell damage + 0,055 bonus flat che vien dato all'AP e trasformato in melee
-        int32 shadowBonus = int32((owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_SHADOW)) - owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_SHADOW)*0.115);
+        int32 shadowBonus = int32(((owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_SHADOW)) - owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_SHADOW))*0.115);
         SetAttackTime(BASE_ATTACK, 1360);
         SetSpeed(MOVE_RUN, 1.3);
         SetMeleeBonusDamage(shadowBonus);
-        SetModifierValue(UNIT_MOD_ARMOR,             BASE_VALUE, 10000.0f);
-        SetModifierValue(UNIT_MOD_RESISTANCE_HOLY,   BASE_VALUE, 300.0f);
-        SetModifierValue(UNIT_MOD_RESISTANCE_FIRE,   BASE_VALUE, 300.0f);
-        SetModifierValue(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, 300.0f);
-        SetModifierValue(UNIT_MOD_RESISTANCE_FROST,  BASE_VALUE, 300.0f);
-        SetModifierValue(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, 300.0f);
-        SetModifierValue(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, 300.0f);
-        for(int i=0; i<MECHANIC_SAPPED; i++)
-            ApplySpellImmune(0,IMMUNITY_MECHANIC,i,true);
-        UpdateAllStats();
+        SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, 7000.0f);
+        ApplySpellImmune(0,IMMUNITY_MECHANIC,IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK,true);
+
+        for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; i++)
+            SetResistance(SpellSchools(i), 500);
     }
 
     owner->SetPet(this);                                    // in DB stored only full controlled creature
