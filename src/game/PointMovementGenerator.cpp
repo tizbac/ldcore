@@ -43,14 +43,11 @@ bool PointMovementGenerator<T>::Update(T &unit, const uint32 &diff)
 
     if(unit.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED))
     {
+        for (int j = 0; j < 3; j++)
+            unit.m_delayTrigger[j] = 0;
+
         if(unit.hasUnitState(UNIT_STAT_CHARGING))
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                unit.m_delayTrigger[j] = 0;
-            }
             return false;
-        }
         else
             return true;
     }
