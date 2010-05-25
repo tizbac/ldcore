@@ -12558,36 +12558,24 @@ void Unit::SetStunned(bool apply)
 
 void Unit::SetRooted(bool apply)
 {
-    uint32 apply_stat = UNIT_STAT_ROOT;
     if(apply)
     {
-        SetFlag(UNIT_FIELD_FLAGS,(apply_stat<<16)); // probably wrong
+        WorldPacket data(SMSG_FORCE_MOVE_ROOT, 10);
+        data.append(GetPackGUID());
+        data << (uint32)2;
+        SendMessageToSet(&data,true);
 
-        if(GetTypeId() == TYPEID_PLAYER)
-        {
-            SetUnitMovementFlags(0);
-
-            WorldPacket data(SMSG_FORCE_MOVE_ROOT, 10);
-            data.append(GetPackGUID());
-            data << (uint32)2;
-            SendMessageToSet(&data,true);
-        }
-        else
+        if(GetTypeId() != TYPEID_PLAYER)
             ((Creature *)this)->StopMoving();
     }
     else
     {
-        RemoveFlag(UNIT_FIELD_FLAGS,(apply_stat<<16)); // probably wrong
-
         if(!hasUnitState(UNIT_STAT_STUNNED))      // prevent allow move if have also stun effect
         {
-            if(GetTypeId() == TYPEID_PLAYER)
-            {
-                WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 10);
-                data.append(GetPackGUID());
-                data << (uint32)2;
-                SendMessageToSet(&data,true);
-            }
+            WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 10);
+            data.append(GetPackGUID());
+            data << (uint32)2;
+            SendMessageToSet(&data,true);
         }
     }
 }
