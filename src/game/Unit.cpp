@@ -11284,7 +11284,7 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                 if (procExtra&PROC_EX_DODGE && GetTypeId() == TYPEID_PLAYER && getClass() == CLASS_WARRIOR)
                 {
                     ((Player*)this)->AddComboPoints(pTarget, 1);
-                    ((Player*)this)->ModifyPower(POWER_RAGE, 50);
+                    ((Player*)this)->ModifyPower(POWER_RAGE, 70);
                     StartReactiveTimer( REACTIVE_OVERPOWER );
                 }
                 // Enable AURA_STATE_CRIT on crit

@@ -1865,12 +1865,15 @@ void Spell::EffectTriggerSpell(uint32 i)
 {
     uint32 triggered_spell_id = m_spellInfo->EffectTriggerSpell[i];
 
-    for (int j = 0; j < 3; j++)
+    if(m_caster->isInCombat())
     {
-        if(m_spellInfo->Effect[j] == SPELL_EFFECT_CHARGE && j != i)
+        for (int j = 0; j < 3; j++)
         {
-            m_caster->m_delayTrigger[i] = triggered_spell_id;
-            return;
+            if(m_spellInfo->Effect[j] == SPELL_EFFECT_CHARGE && j != i)
+            {
+                m_caster->m_delayTrigger[i] = triggered_spell_id;
+                return;
+            }
         }
     }
 

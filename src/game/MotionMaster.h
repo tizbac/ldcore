@@ -76,7 +76,7 @@ enum RotateDirection
 };
 
 // assume it is 25 yard per 0.6 second
-#define SPEED_CHARGE    30.0f
+#define SPEED_CHARGE    35.0f
 
 class TRINITY_DLL_SPEC MotionMaster //: private std::stack<MovementGenerator *>
 {
