@@ -23,12 +23,17 @@
 /// \file
 #include "SystemConfig.h"
 #include "revision.h"
-
+#include <fstream>
+#include <iostream>
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "Config/ConfigEnv.h"
 #include "Log.h"
+#include "World.h"
+#include <time.h>
 #include "Master.h"
+#include <signal.h>
+#include <execinfo.h>
 
 #ifndef _TRINITY_CORE_CONFIG
 # define _TRINITY_CORE_CONFIG  "trinitycore.conf"
@@ -53,7 +58,52 @@ char serviceDescription[] = "Massive Network Game Object Server";
  */
 int m_ServiceStatus = -1;
 #endif
-
+void SCallBack(int s)
+{
+  if ( s == SIGSEGV or s == SIGABRT or s == SIGFPE)
+  {
+    std::ofstream stacktracefile;
+    time_t t;
+    struct tm * timeinfo;
+    char tstr[128];
+    time (&t);
+    timeinfo = localtime ( &t );
+    strftime ( tstr, 128, "%d_%m_%Y__%H.%M.%S",timeinfo);
+    std::string logdir = sConfig.GetStringDefault("LogsDir","");
+    
+    stacktracefile.open(std::string(logdir+"/Crash_"+std::string(tstr)+".log").c_str());
+    printf("\x1b[31m-------------------------------------------------------------------------------\x1b[0m\n");
+    stacktracefile << "-------------------------------------------------------------------------------" << std::endl;
+    printf("\x1b[36mTrinity core è crashato col segnale %d\x1b[0m\n",s);
+    stacktracefile << "Trinity core è crashato col segnale " << s << std::endl;
+    printf("Stacktrace:\n");
+    stacktracefile << "Stacktrace:" << std::endl;
+    void *array[100];
+    size_t size;
+    size = backtrace(array, 100);
+    char ** bt = backtrace_symbols(array, size);
+    for ( int i = 0; i < size;i++)
+    {
+      printf("\t#%d : %s\n",i,bt[i]);
+      stacktracefile << "\t#" << i << " : " << bt[i] << std::endl;
+    }
+    printf("\x1b[31m--------------------------------------------------------------------------------\x1b[0m\n");
+    stacktracefile << "-------------------------------------------------------------------------------" << std::endl;
+    stacktracefile.close();
+  }
+  if ( s == SIGSEGV )
+  {
+    raise(SIGKILL);
+    
+  }else if ( s == SIGABRT || s == SIGFPE )
+  {
+    if ( Trinity::Singleton<World>::Instance().IsStopped() )
+      raise(SIGKILL);
+    else
+      Trinity::Singleton<World>::Instance().StopNow(2);
+  }
+  
+}
 DatabaseType WorldDatabase;                                 ///< Accessor to the world database
 DatabaseType CharacterDatabase;                             ///< Accessor to the character database
 DatabaseType LoginDatabase;                                 ///< Accessor to the realm/login database
@@ -81,6 +131,10 @@ extern int main(int argc, char **argv)
     ///- Command line parsing to get the configuration file name
     char const* cfg_file = _TRINITY_CORE_CONFIG;
     int c=1;
+    signal(SIGSEGV,SCallBack);
+    signal(SIGABRT,SCallBack);
+    signal(SIGFPE,SCallBack);
+    
     while( c < argc )
     {
         if( strcmp(argv[c],"-c") == 0)
