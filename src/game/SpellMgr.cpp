@@ -2473,6 +2473,9 @@ void SpellMgr::LoadSpellCustomAttr()
         case 12723: // Sweeping Strikes proc
             spellInfo->Attributes |= SPELL_ATTR_IMPOSSIBLE_DODGE_PARRY_BLOCK;
             break;
+        case 27066:
+            spellInfo->Dispel = 0; //Trueshot Aura Rank 4 Dispel
+            break;
         default:
             break;
         }

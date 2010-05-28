@@ -8612,6 +8612,11 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
             }
         }
 
+        float LvlPenalty = CalculateLevelPenalty(spellProto);
+        // Gift of the Naaru - 100%
+        if (spellProto->Id == 28880)
+            LvlPenalty = 1.0f;
+
         // Exception
         switch (spellProto->SpellFamilyName)
         {
@@ -8659,14 +8664,20 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
                 if ( spellProto->SpellFamilyFlags & 0x100040000LL )
                     CastingTime = 0;
                 break;
+            case SPELLFAMILY_WARLOCK:
+            // Health Funnel
+                if ((spellProto->SpellFamilyFlags & 0x1000000LL) && spellProto->SpellIconID == 153)
+                {
+                    CastingTime = 3500;
+                    DotFactor = 2.875f;
+                }
+                break;
             case SPELLFAMILY_WARRIOR:
             case SPELLFAMILY_ROGUE:
             case SPELLFAMILY_HUNTER:
                 CastingTime = 0;
                 break;
         }
-
-        float LvlPenalty = CalculateLevelPenalty(spellProto);
 
         // Spellmod SpellDamage
         //float SpellModSpellDamage = 100.0f;

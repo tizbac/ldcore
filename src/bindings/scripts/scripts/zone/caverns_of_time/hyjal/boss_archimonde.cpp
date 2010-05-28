@@ -182,7 +182,10 @@ struct TRINITY_DLL_DECL mob_doomfireAI : public ScriptedAI
         }
 
         if(suicide)
+        {
             m_creature->Kill(m_creature);
+            return;
+        }
     }
 
     void UpdateAI(const uint32 diff)
@@ -208,10 +211,17 @@ struct TRINITY_DLL_DECL mob_doomfireAI : public ScriptedAI
             {
                 Unit* Archimonde = Unit::GetUnit((*m_creature), ArchimondeGUID);
                 if(!Archimonde || !Archimonde->isAlive())
+                {
                     m_creature->Kill(m_creature);
+                    return;
+                }
                 CheckTimer = 5000;
             }
-            else m_creature->Kill(m_creature);
+            else
+            {
+                m_creature->Kill(m_creature);
+                return;
+            }
         }else CheckTimer -= diff;
     }
 };
@@ -270,10 +280,16 @@ struct TRINITY_DLL_DECL mob_doomfire_targettingAI : public ScriptedAI
                     SummonTimer = 500;
                 }
                 else
+                {
                     m_creature->Kill(m_creature);
+                    return;
+                }
             }
             else
+            {
                 m_creature->Kill(m_creature);
+                return;
+            }
         }else SummonTimer -= diff;
 
         if(ChangeTargetTimer < diff)
@@ -633,7 +649,10 @@ struct TRINITY_DLL_DECL boss_archimondeAI : public hyjal_trashAI
             }else SummonWispTimer -= diff;
 
             if(WispCount >= 30)
+            {
                 m_creature->Kill(m_creature);
+                return;
+            }
         }
 
         if(Enraged)

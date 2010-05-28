@@ -6024,19 +6024,29 @@ void Spell::EffectCharge(uint32 /*i*/)
 
     float fNearX, fNearY, fNearZ;
     float fCentX, fCentY, fCentZ;
+
     target->GetPosition(fCentX, fCentY, fCentZ);
     target->GetContactPoint(m_caster, fNearX, fNearY, fNearZ, 0.0);
 
-    float fFloor  = m_caster->GetMap()->GetHeight(fNearX, fNearY, fNearZ, true);
-    float fGround = m_caster->GetMap()->GetHeight(fNearX, fNearY, MAX_HEIGHT);
-
-    fNearZ = fFloor > fGround ? fFloor : fGround;
-
-    if(fabs(fCentZ-fNearZ) > 1.0f)
+    if(target->GetTypeId() == TYPEID_PLAYER && ((Player*)target)->isMoving())
     {
         fNearX = fCentX;
         fNearY = fCentY;
         fNearZ = fCentZ;
+    }
+    else
+    {
+        float fFloor  = m_caster->GetMap()->GetHeight(fNearX, fNearY, fNearZ, true);
+        float fGround = m_caster->GetMap()->GetHeight(fNearX, fNearY, MAX_HEIGHT);
+
+        fNearZ = fFloor > fGround ? fFloor : fGround;
+
+        if(fabs(fCentZ-fNearZ) > 1.0f)
+        {
+            fNearX = fCentX;
+            fNearY = fCentY;
+            fNearZ = fCentZ;
+        }
     }
 
     if(m_caster->GetTypeId() == TYPEID_PLAYER)

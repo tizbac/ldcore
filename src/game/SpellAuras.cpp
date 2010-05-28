@@ -5945,10 +5945,10 @@ void Aura::PeriodicTick()
                 }
                 else
                 {
-                    pCaster->SendSpellNonMeleeDamageLog(pCaster, GetId(), gain, GetSpellSchoolMask(GetSpellProto()), 0, 0, false, 0, false);
+                    pCaster->SendSpellNonMeleeDamageLog(pCaster, GetId(), dmg, GetSpellSchoolMask(GetSpellProto()), 0, 0, false, 0, false);
 
                     CleanDamage cleanDamage =  CleanDamage(0, BASE_ATTACK, MELEE_HIT_NORMAL );
-                    pCaster->DealDamage(pCaster, gain, &cleanDamage, NODAMAGE, GetSpellSchoolMask(GetSpellProto()), GetSpellProto(), true);
+                    pCaster->DealDamage(pCaster, dmg, &cleanDamage, NODAMAGE, GetSpellSchoolMask(GetSpellProto()), GetSpellProto(), true);
                 }
             }
 
