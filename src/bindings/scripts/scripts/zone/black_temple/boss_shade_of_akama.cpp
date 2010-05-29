@@ -298,7 +298,9 @@ struct TRINITY_DLL_DECL boss_shade_of_akamaAI : public ScriptedAI
         if(!who || IsBanished) return;
 
         if(who->isTargetableForAttack() && who != m_creature)
+        {
             DoStartMovement(who);
+        }
     }
 
     void IncrementDeathCount(uint64 guid = 0)               // If guid is set, will remove it from list of sorcerer
@@ -373,7 +375,8 @@ struct TRINITY_DLL_DECL boss_shade_of_akamaAI : public ScriptedAI
         Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange> searcher(ChannelerList, check);
         TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange>, GridTypeMapContainer> visitor(searcher);
 
-        cell.Visit(pair, visitor, *(m_creature->GetMap()));
+        CellLock<GridReadGuard> cell_lock(cell, pair);
+        cell_lock->Visit(cell_lock, visitor, *(m_creature->GetMap()));
 
         if(!ChannelerList.empty())
         {
@@ -399,14 +402,31 @@ struct TRINITY_DLL_DECL boss_shade_of_akamaAI : public ScriptedAI
             if(Creature* Channeler = (Unit::GetCreature(*m_creature, *itr)))
                 Channeler->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
+    void ResetChannelers()
+    {
+       if(Channelers.empty())
+        {
+            error_log("SD2 ERROR: Channeler List is empty, Shade of Akama encounter will be buggy");
+            return;
+        }
 
+        for(std::list<uint64>::iterator itr = Channelers.begin(); itr != Channelers.end(); ++itr)
+            if(Creature* Channeler = (Unit::GetCreature(*m_creature, *itr)))
+            {
+                Channeler->Respawn();
+                
+                Channeler->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            }
+      
+    }
     void SetAkamaGUID(uint64 guid) { AkamaGUID = guid; }
 
     void UpdateAI(const uint32 diff)
     {
-        if(!m_creature->isInCombat())
+        //printf("Deathcount=%d\n",DeathCount);
+        if((!m_creature->isInCombat()) && DeathCount < 6)
             return;
-
+        
         if(IsBanished)
         {
             // Akama is set in the threatlist so when we reset, we make sure that he is not included in our check
@@ -559,7 +579,7 @@ struct TRINITY_DLL_DECL npc_akamaAI : public ScriptedAI
     uint32 EndingTalkCount;
     uint32 WayPointId;
     uint32 BrokenSummonIndex;
-
+    uint64 PlayerGUID;
     std::list<uint64> BrokenList;
 
     bool EventBegun;
@@ -573,12 +593,14 @@ struct TRINITY_DLL_DECL npc_akamaAI : public ScriptedAI
         DestructivePoisonTimer = 15000;
         LightningBoltTimer = 10000;
         CheckTimer = 2000;
-
+        PlayerGUID = 0;
         if(!EventBegun)
         {
             m_creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);      // Database sometimes has very very strange values
             m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
         }
+        if ( pInstance && pInstance->GetData(DATA_SHADEOFAKAMAEVENT) == DONE )
+          m_creature->Relocate(AkamaWP[0].x,AkamaWP[0].y,AkamaWP[0].z,AkamaWP[0].o);
         summons.DespawnAll();
 
         m_creature->setActive(true);
@@ -595,13 +617,25 @@ struct TRINITY_DLL_DECL npc_akamaAI : public ScriptedAI
             summons.Despawn(summon);
     }
 
-    void EnterCombat(Unit* who) {}
+    void EnterCombat(Unit* who) { m_creature->RemoveAurasDueToSpell(40447);}
+    void BeginEvent(Player * pl)
+    {
+      m_creature->GetMotionMaster()->MovePoint(10,AkamaWP[0].x,AkamaWP[0].y,AkamaWP[0].z);
+      if ( pl )
+        PlayerGUID = pl->GetGUID();
+      
+    }
 
-    void BeginEvent(Player* pl)
+    void BeginEventREAL()
     {
         if(!pInstance)
             return;
-
+        Player * pl = ObjectAccessor::GetPlayer(*m_creature,PlayerGUID);
+        if ( pl )
+        {
+          //printf("Player=%s\n",pl->GetName());
+          
+        }
         ShadeGUID = pInstance->GetData64(DATA_SHADEOFAKAMA);
         if(!ShadeGUID)
             return;
@@ -627,16 +661,19 @@ struct TRINITY_DLL_DECL npc_akamaAI : public ScriptedAI
     {
         if(type != POINT_MOTION_TYPE)
             return;
-
+        //printf("MovementInform(%u,%u)\n",type,id);
         switch(id)
         {
         case 0: ++WayPointId; break;
 
+        case 10:
+            BeginEventREAL();
+            break;
         case 1:
             if(Creature* Shade = Unit::GetCreature(*m_creature, ShadeGUID))
             {
                 m_creature->SetUInt64Value(UNIT_FIELD_TARGET, ShadeGUID);
-                DoCast(Shade, SPELL_AKAMA_SOUL_RETRIEVE);
+                DoCast(Shade, SPELL_AKAMA_SOUL_RETRIEVE, true);
                 EndingTalkCount = 0;
                 SoulRetrieveTimer = 16000;
             }
@@ -660,7 +697,16 @@ struct TRINITY_DLL_DECL npc_akamaAI : public ScriptedAI
         HasYelledOnce = false;
         Creature* Shade = Unit::GetCreature((*m_creature), ShadeGUID);
         if(Shade && Shade->isAlive())
+        {
             ((boss_shade_of_akamaAI*)Shade->AI())->HasKilledAkama = true;
+            ((boss_shade_of_akamaAI*)Shade->AI())->ResetChannelers();
+            ((boss_shade_of_akamaAI*)Shade->AI())->EnterEvadeMode();
+        }
+        float x,y,z,o;
+        m_creature->GetHomePosition(x,y,z,o);
+        m_creature->Relocate(x,y,z);
+        m_creature->Respawn();
+        
         summons.DespawnAll();
     }
 
@@ -684,7 +730,7 @@ struct TRINITY_DLL_DECL npc_akamaAI : public ScriptedAI
                 {
                     if(CastSoulRetrieveTimer < diff)
                     {
-                        DoCast(Shade, SPELL_AKAMA_SOUL_CHANNEL);
+                        DoCast(Shade, SPELL_AKAMA_SOUL_CHANNEL, true);
                         CastSoulRetrieveTimer = 60000;
                     }else CastSoulRetrieveTimer -= diff;
                 }
@@ -715,7 +761,7 @@ struct TRINITY_DLL_DECL npc_akamaAI : public ScriptedAI
                         ShadeHasDied = true;
                         WayPointId = 0;
                         m_creature->SetUnitMovementFlags(MOVEMENTFLAG_WALK_MODE);
-                        m_creature->GetMotionMaster()->MovePoint(WayPointId, AkamaWP[0].x, AkamaWP[0].y, AkamaWP[0].z);
+                        m_creature->GetMotionMaster()->MovePoint(WayPointId, AkamaWP[1].x, AkamaWP[1].y, AkamaWP[1].z);
                     }
                     if(Shade && Shade->isAlive())
                     {
