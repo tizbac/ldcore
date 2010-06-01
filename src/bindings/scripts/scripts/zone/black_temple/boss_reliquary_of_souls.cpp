@@ -191,9 +191,7 @@ struct TRINITY_DLL_DECL boss_reliquary_of_soulsAI : public ScriptedAI
         Timer = 0;
     }
 
-    void AttackStart(Unit* who)
-    {
-    }
+
 
     bool SummonSoul()
     {
