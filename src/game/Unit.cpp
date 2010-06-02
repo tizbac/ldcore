@@ -7781,7 +7781,7 @@ void Unit::SetPet(Pet* pet)
     SetUInt64Value(UNIT_FIELD_SUMMON, pet ? pet->GetGUID() : 0);
 
     // FIXME: hack, speed must be set only at follow
-    if(pet)
+    if(pet && pet->GetCharmInfo()->HasCommandState(COMMAND_FOLLOW))
         for(int i = 0; i < MAX_MOVE_TYPE; ++i)
             pet->SetSpeed(UnitMoveType(i), m_speed_rate[i], true);
 }
@@ -8907,7 +8907,18 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
     int32 APbonus = 0;
     if(attType == RANGED_ATTACK)
     {
-        APbonus += pVictim->GetTotalAuraModifier(SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS);
+        AuraList const& mAttackerPower = pVictim->GetAurasByType(SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS);
+        for(AuraList::const_iterator i = mAttackerPower.begin();i != mAttackerPower.end(); ++i)
+        {
+            if((*i)->GetSpellProto()->Id == 34501) //Expose Weakness Ranged AP
+            {
+                Unit *pCaster = (*i)->GetCaster();
+                if(pCaster)
+                    APbonus += (*i)->GetModifierValue() * pCaster->GetStat(STAT_AGILITY) / 100.0f;
+            }
+            else 
+                APbonus += (*i)->GetModifierValue();
+        }
 
         // ..done (base at attack power and creature type)
         AuraList const& mCreatureAttackPower = GetAurasByType(SPELL_AURA_MOD_RANGED_ATTACK_POWER_VERSUS);
@@ -8917,7 +8928,43 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
     }
     else
     {
-        APbonus += pVictim->GetTotalAuraModifier(SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS);
+        AuraList const& mAttackerPower = pVictim->GetAurasByType(SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS);
+        for(AuraList::const_iterator i = mAttackerPower.begin();i != mAttackerPower.end(); ++i)
+        {
+            if((*i)->GetSpellProto()->Id == 34501) //Expose Weakness Melee AP
+            {
+                Unit *pCaster = (*i)->GetCaster();
+                if(pCaster)
+                    APbonus += (*i)->GetModifierValue() * pCaster->GetStat(STAT_AGILITY) / 100.0f;
+            }
+            else if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_HUNTER && ((*i)->GetSpellProto()->SpellFamilyFlags&0x0000000000000400LL)) //Improved Hunter's Mark
+            {
+                Unit *pCaster = (*i)->GetCaster();
+                if(pCaster)
+                {
+                    AuraList const& mClassScriptAuras = pCaster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+                    for(AuraList::const_iterator k = mClassScriptAuras.begin();k != mClassScriptAuras.end(); ++k)
+                    {
+                        switch((*k)->GetModifier()->m_miscvalue)
+                        {
+                            case 5236:
+                            case 5237:
+                            case 5238:
+                            case 5239:
+                            case 5240:
+                            {
+                                APbonus += (*i)->GetSpellProto()->EffectBasePoints[1] * (*k)->GetModifier()->m_amount / 100.0f;
+                            }
+                            break;
+                            default:
+                            break;
+                        }
+                    }
+                }
+             }
+             else 
+                 APbonus += (*i)->GetModifierValue();
+        }
 
         // ..done (base at attack power and creature type)
         AuraList const& mCreatureAttackPower = GetAurasByType(SPELL_AURA_MOD_MELEE_ATTACK_POWER_VERSUS);
@@ -11464,7 +11511,7 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                 // Hunter's Mark (1-4 Rangs)
                 if (spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && (spellInfo->SpellFamilyFlags&0x0000000000000400LL))
                 {
-                    uint32 basevalue = triggeredByAura->GetBasePoints();
+                    uint32 basevalue = spellInfo->EffectBasePoints[1];
                     auraModifier->m_amount += basevalue/10;
                     if (auraModifier->m_amount > basevalue*4)
                         auraModifier->m_amount = basevalue*4;
