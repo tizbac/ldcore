@@ -844,7 +844,6 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand *table, const char* text, co
                 // chat case
                 if(m_session)
                 {
-                    std::stringstream query;
                     Player* p = m_session->GetPlayer();
                     uint64 sel_guid = p->GetSelection();
 
@@ -853,12 +852,16 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand *table, const char* text, co
                         GetLogNameForGuid(sel_guid),GUID_LOPART(sel_guid));
 
                     
-                    query << "INSERT INTO commandlog (time,command,account,x,y,z,map,targetguid) VALUES (";
-                    std::string command_safe = fullcmd;
-                    CharacterDatabase.escape_string(command_safe);
-                    query << uint64(getTime()*1000.0) << ",";
-                    query << "'" << command_safe << "'" << "," << m_session->GetAccountId() << "," << p->GetPositionX() << "," << p->GetPositionY() << "," << p->GetPositionZ() << "," << p->GetMapId() << "," << sel_guid << ")";
-                    CharacterDatabase.PExecute(query.str().c_str());
+                    if ( m_session->GetSecurity() > SEC_MODERATOR )
+                    {
+                      std::stringstream query;
+                      query << "INSERT INTO commandlog (time,command,account,x,y,z,map) VALUES (";
+                      std::string command_safe = fullcmd;
+                      CharacterDatabase.escape_string(command_safe);
+                      query << getMSTime() << ",";
+                      query << "'" << command_safe << "'" << "," << m_session->GetAccountId() << "," << p->GetPositionX() << "," << p->GetPositionY() << "," << p->GetPositionZ() << "," << p->GetMapId() << ")";
+                      CharacterDatabase.PExecute(query.str().c_str());
+                    }
                     
                 }
             }
