@@ -69,10 +69,32 @@ class TRINITY_DLL_SPEC UnitAI
         void AttackStartCaster(Unit *victim, float dist);
 
         void DoCast(uint32 spellId);
+        /* WARNING: LE SPELL CON I TICK CHE TRIGGERANO ALTRE SPELL
+        AD ESEMPIO ARCANE MISSILES
+        VANNO CASTATE DAL TARGET AL CASTER ,
+        IL PERCHé CHIEDETELO AGLI AUTORI DI MANGOS!!! */
+        
         void DoCast(Unit* victim, uint32 spellId, bool triggered = false);
+        /* WARNING: LE SPELL CON I TICK CHE TRIGGERANO ALTRE SPELL
+        AD ESEMPIO ARCANE MISSILES
+        VANNO CASTATE DAL TARGET AL CASTER ,
+        IL PERCHé CHIEDETELO AGLI AUTORI DI MANGOS!!! */
+        
+        
         void DoCastVictim(uint32 spellId, bool triggered = false);
+        /* WARNING: LE SPELL CON I TICK CHE TRIGGERANO ALTRE SPELL
+        AD ESEMPIO ARCANE MISSILES
+        VANNO CASTATE DAL TARGET AL CASTER ,
+        IL PERCHé CHIEDETELO AGLI AUTORI DI MANGOS!!! */
+        
+        
         void DoCastAOE(uint32 spellId, bool triggered = false);
-
+        /* WARNING: LE SPELL CON I TICK CHE TRIGGERANO ALTRE SPELL
+        AD ESEMPIO ARCANE MISSILES
+        VANNO CASTATE DAL TARGET AL CASTER ,
+        IL PERCHé CHIEDETELO AGLI AUTORI DI MANGOS!!! */
+        
+        
         float DoGetSpellMaxRange(uint32 spellId, bool positive = false);
 
         void DoMeleeAttackIfReady();

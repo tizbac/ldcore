@@ -340,7 +340,10 @@ struct TRINITY_DLL_DECL boss_aranAI : public ScriptedAI
                 if (AvailableSpells)
                 {
                     CurrentNormalSpell = Spells[rand() % AvailableSpells];
-                    DoCast(target, CurrentNormalSpell);
+                    if (CurrentNormalSpell == SPELL_ARCMISSLE )
+                      target->CastSpell(m_creature,CurrentNormalSpell,false);
+                    else
+                      DoCast(target, CurrentNormalSpell);
                 }
             }
             NormalCastTimer = 1000;
