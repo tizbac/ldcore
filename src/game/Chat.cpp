@@ -185,7 +185,7 @@ ChatCommand * ChatHandler::getCommandTable()
     {
         { "inarc",          SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugInArcCommand,          "", NULL },
         { "spellfail",      SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSpellFailCommand,      "", NULL },
-        { "setpoi",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleSetPoiCommand,              "", NULL },
+        { "setpoi",         SEC_ADMINISTRATOR,  faGetLootRlse, &ChatHandler::HandleSetPoiCommand,              "", NULL },
         { "qpartymsg",      SEC_ADMINISTRATOR,  false, &ChatHandler::HandleSendQuestPartyMsgCommand,   "", NULL },
         { "qinvalidmsg",    SEC_ADMINISTRATOR,  false, &ChatHandler::HandleSendQuestInvalidMsgCommand, "", NULL },
         { "equiperr",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleEquipErrorCommand,          "", NULL },
@@ -447,7 +447,10 @@ ChatCommand * ChatHandler::getCommandTable()
         { "addformation",   SEC_MODERATOR,      false, &ChatHandler::HandleNpcAddFormationCommand,     "", NULL },
         { "setlink",        SEC_MODERATOR,      false, &ChatHandler::HandleNpcSetLinkCommand,          "", NULL },
       //  { "respawn",		SEC_GAMEMASTER,		false, &ChatHandler::HandleNpcRespawnCommand,		   "", NULL },
-        { "reloadlua",      SEC_MODERATOR,      false, &ChatHandler::HandleReloadLuaCommand,           "", NULL },
+        { "reloadlua",      SEC_GAMEMASTER,      false, &ChatHandler::HandleReloadLuaCommand,           "", NULL },
+        //{ "setdeathstate",  SEC_MODERATOR,      false, &ChatHandler::HandleSetDeathState,       "", NULL },
+        { "setlootrecipient",  SEC_GAMEMASTER,      false, &ChatHandler::HandleSetLootRecipient,        "", NULL },
+        { "getlootrecipient",  SEC_GAMEMASTER,      false, &ChatHandler::HandleGetLootRecipient,        "", NULL },
         //{ TODO: fix or remove this commands
         { "name",           SEC_GAMEMASTER,     false, &ChatHandler::HandleNameCommand,                "", NULL },
         { "subname",        SEC_GAMEMASTER,     false, &ChatHandler::HandleSubNameCommand,             "", NULL },

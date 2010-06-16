@@ -73,6 +73,93 @@ bool ChatHandler::HandleReloadLuaCommand(const char * args)
   PSendSysMessage("|c0000ff00AI Lua ricaricata.|r");
   return true;
 }
+bool ChatHandler::HandleSetDeathState(const char * args)
+{
+  Creature * c = getSelectedCreature();
+  if ( ! c )
+  {
+    PSendSysMessage(LANG_SELECT_CREATURE);
+    return false;
+  }
+  
+  char * state = strtok((char*)args," ");
+  if (!state )
+  {
+    PSendSysMessage("Il secondo parametro deve essere il deathstate da impostare sul mob il quale può essere:");
+    PSendSysMessage(" 0 - ALIVE\n 1 - JUST_DIED\n 2 - CORPSE\n 3 - DEAD\n 4 - JUST_ALIVED\n 5 - DEAD_FALLING");
+    return false;
+  }
+  unsigned int statei;
+  if (sscanf(state,"%i",&statei) < 1)
+  {
+    PSendSysMessage("Il secondo parametro deve essere il deathstate da impostare sul mob il quale può essere:");
+    PSendSysMessage(" 0 - ALIVE\n 1 - JUST_DIED\n 2 - CORPSE\n 3 - DEAD\n 4 - JUST_ALIVED\n 5 - DEAD_FALLING");
+    return false;
+  }
+  if ( statei > 5 )
+  {
+    PSendSysMessage("Il secondo parametro deve essere il deathstate da impostare sul mob il quale può essere:");
+    PSendSysMessage(" 0 - ALIVE\n 1 - JUST_DIED\n 2 - CORPSE\n 3 - DEAD\n 4 - JUST_ALIVED\n 5 - DEAD_FALLING");
+    return false;
+  }
+  c->setDeathState((DeathState)statei);
+  return true;
+}
+bool ChatHandler::HandleSetLootRecipient(const char * args)
+{
+  Creature * c = getSelectedCreature();
+  if ( ! c )
+  {
+    PSendSysMessage(LANG_SELECT_CREATURE);
+    return false;
+  }
+  char * playername = strtok((char*)args," ");
+  if ( !playername )
+  {
+    PSendSysMessage("Il secondo parametro deve essere il nome del player che potrà lootare il mob");
+    return false;
+  }
+  Player * plr = ObjectAccessor::Instance().FindPlayerByName(playername);
+  if ( !plr )
+  {
+    PSendSysMessage("Player non trovato '%s'",playername);
+    return false;
+  }
+  if ( c->GetMap() != plr->GetMap() )
+  {
+    PSendSysMessage("Il player ed il mob non stanno nella stessa mappa");
+    return false;
+    
+  }
+  if ( c->GetDistance2d(plr) > 5.0 &&  c->GetDistance2d(plr) < 200 )
+  {
+    plr->GetMotionMaster()->MoveCharge(c->GetPositionX(),c->GetPositionY(),c->GetPositionZ());// Porta il player sul cadavere
+  }else if ( c->GetDistance2d(plr) > 200 )
+  {
+    PSendSysMessage("Il player ed il mob sono troppo distanti ( > 200 yds )");
+    return false;
+    
+    
+  }
+
+  c->setDeathState(ALIVE);// Ressa il mob ( usando questo se il mob è stato già lootato , il loot sarà vuoto anche se brillerà)
+  c->SetHealth(c->GetMaxHealth());//Fulla la vita
+  c->SetLootRecipient(plr);//Imposta il player che prenderà il loot
+  c->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);//Per sicurezza...
+  ObjectAccessor::UpdateObjectVisibility(c);//Lo fa ricomparire sui client
+  
+  plr->DealDamage(c,0xFFFFFFFF);//Killa il mob con una botta che farà prendere di sicuro il loot al player
+    
+  
+ 
+  
+  
+  plr->SendLoot(c->GetGUID(),LOOT_CORPSE);//Apri il loot
+  
+  
+  return true;
+}
+
 bool ChatHandler::HandleMuteCommand(const char* args)
 {
     if (!*args)

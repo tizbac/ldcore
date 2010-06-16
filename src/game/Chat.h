@@ -336,7 +336,8 @@ class ChatHandler
         bool HandleFreezeCommand(const char *args);
         bool HandleUnFreezeCommand(const char *args);
         bool HandleListFreezeCommand(const char* args);
-
+        bool HandleSetLootRecipient(const char* args);
+        bool HandleSetDeathState(const char* args);
         bool HandleCharacterDeleteCommand(const char* args);
         bool HandleBanAccountCommand(const char* args);
         bool HandleBanCharacterCommand(const char* args);
