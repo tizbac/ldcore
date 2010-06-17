@@ -170,6 +170,8 @@ struct TRINITY_DLL_DECL mob_doomfireAI : public ScriptedAI
 
     void KilledUnit(Unit* victim)
     {
+      
+        
         bool suicide = true;
         if(ArchimondeGUID)
         {
@@ -180,10 +182,11 @@ struct TRINITY_DLL_DECL mob_doomfireAI : public ScriptedAI
                 Archimonde->AI()->KilledUnit(victim);
             }
         }
-
+        if ( !m_creature->isAlive() )
+          return;
         if(suicide)
         {
-            m_creature->Kill(m_creature);
+            m_creature->ForcedDespawn();
             return;
         }
     }
