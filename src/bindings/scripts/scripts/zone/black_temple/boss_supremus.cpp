@@ -40,13 +40,38 @@ EndScriptData */
 #define CREATURE_VOLCANO            23085
 #define CREATURE_STALKER            23095
 
-struct TRINITY_DLL_DECL molten_flameAI : public NullCreatureAI
+struct TRINITY_DLL_DECL molten_flameAI : public ScriptedAI
 {
-    molten_flameAI(Creature *c) : NullCreatureAI(c)
-    {
-        float x, y, z;
-        me->GetNearPoint(me, x, y, z, 1, 50, M_PI*2*rand_norm());
-        me->GetMotionMaster()->MovePoint(0, x, y, z);
+    molten_flameAI(Creature *c) : ScriptedAI(c)
+	{
+	   ScriptedInstance *pInstance;
+         pInstance = ((ScriptedInstance*)c->GetInstanceData());
+    	  
+         float x, y, z;
+
+         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+         if(!pInstance)
+            return;
+	
+	   uint64 SupremusGUID = pInstance->GetData64(DATA_SUPREMUS);
+	   Creature* Supremus = (Unit::GetCreature((*m_creature), SupremusGUID));
+	   if(Supremus)
+	   {
+		Unit* target = Supremus->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 40, true);
+		if(target)
+		{		
+	  		x = target->GetPositionX();
+	  		y = target->GetPositionY();
+	  		z = target->GetPositionZ();
+
+	  		me->SetHomePosition(x,y,z,0);
+	  		me->GetMotionMaster()->MoveTargetedHome();
+	  		
+	  		DoCast(target, SPELL_MOLTEN_FLAME);
+	  	}
+	   }
     }
 };
 
