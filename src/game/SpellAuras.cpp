@@ -2135,7 +2135,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                   c->SetSpell(3,40175);
                   c->SetSpell(4,40322);
                   pl->CastSpell(c,42013,true);//Casta il charm
-                  pl->SetVisibility(VISIBILITY_OFF);
+                  //pl->SetVisibility(VISIBILITY_OFF);
                 }
               }
               
