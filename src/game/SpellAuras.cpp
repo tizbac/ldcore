@@ -1045,7 +1045,31 @@ void Aura::_AddAura()
 void Aura::_RemoveAura()
 {
     Unit* caster = GetCaster();
-
+    if ( caster && m_spellProto->Id == 22650 && caster->GetTypeId() == TYPEID_PLAYER )
+    {
+      Player * pl = (Player*)caster;
+      Unit * ch = pl->GetCharm();
+      if ( ch && ch->GetTypeId() == TYPEID_UNIT )
+      {
+        Creature * c = ObjectAccessor::GetCreature(*pl,ch->GetGUID());
+        if ( c )
+        {
+          pl->StopCastingCharm();
+          pl->SetHealth(c->GetHealth());
+          c->CombatStop();
+          c->DeleteFromDB();
+          c->CleanupsBeforeDelete();
+          c->AddObjectToRemoveList();
+          
+        }else{
+          sLog.outError("[SHADOW OF DEATH]Impossibile trovare il ghost del player '%s'\n",pl->GetName());
+        }
+      }else{
+        sLog.outError("[SHADOW OF DEATH]Il player non ha più alcun charm\n",pl->GetName());
+      }
+      pl->RemoveAurasDueToSpell(8326);
+      pl->RemoveAurasDueToSpell(42013);
+    }
     if(caster && IsPersistent())
     {
         DynamicObject *dynObj = caster->GetDynObject(GetId(), GetEffIndex());
@@ -2080,10 +2104,47 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     }
                 }
                 return;
+            case 22650:
+              if ( ! ( m_target && m_target->HasAura(42013,0) || caster && caster->HasAura(42013,0) ))
+              {
+                if ( (m_target && m_target->GetTypeId() == TYPEID_PLAYER && !m_target->GetCharm()) || (caster && caster->GetTypeId() == TYPEID_PLAYER && !caster->GetCharm()))
+                {
+                  
+                  sLog.outDebug("Aggiunta dell'Aura Ghost ( Gorefiend) Caster: %s , Target: %s",caster ? caster->GetName() : "NULL",m_target ? m_target->GetName() : "NULL");
+                  Player * pl = NULL;
+                  if ( (m_target && m_target->GetTypeId() == TYPEID_PLAYER && !m_target->GetCharm()) )
+                    pl = (Player*)m_target;
+                  else
+                    pl = (Player*)caster;
+                  Creature * c = pl->SummonCreature(60000,0.0,0.0,0.0,0.0,TEMPSUMMON_MANUAL_DESPAWN,6000000);
+                  if ( !c )
+                    return;
+                  c->SetName(pl->GetName());
+                  c->SetMaxHealth(pl->GetMaxHealth());
+                  c->SetHealth(pl->GetHealth());
+                  c->SetAttackTime(BASE_ATTACK,pl->GetAttackTime(BASE_ATTACK));
+                  c->SetArmor(pl->GetArmor());
+                  c->SetDisplayId(pl->GetDisplayId());
+                  c->SetSpeed(MOVE_RUN,pl->GetSpeed(MOVE_RUN));
+                  c->SetSpeed(MOVE_RUN_BACK,pl->GetSpeed(MOVE_RUN_BACK));
+                  c->setFaction(pl->getFaction());
+                  c->SetLevel(pl->getLevel());
+                  c->SetSpell(0,40314);//Aggiungi le spell 
+                  c->SetSpell(1,40325);
+                  c->SetSpell(2,40157);
+                  c->SetSpell(3,40175);
+                  c->SetSpell(4,40322);
+                  pl->CastSpell(c,42013,true);//Casta il charm
+                  pl->SetVisibility(VISIBILITY_OFF);
+                }
+              }
+              
+              return;                  
             case 46699:                                     // Requires No Ammo
                 if(m_target->GetTypeId()==TYPEID_PLAYER)
                     ((Player*)m_target)->RemoveAmmo();      // not use ammo and not allow use
                 return;
+                
         }
 
         // Earth Shield

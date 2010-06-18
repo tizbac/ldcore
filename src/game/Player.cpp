@@ -1863,6 +1863,7 @@ void Player::RemoveFromWorld()
     if(IsInWorld())
     {
         ///- Release charmed creatures, unsummon totems and remove pets/guardians
+        RemoveAurasDueToSpell(22650);
         StopCastingCharm();
         StopCastingBindSight();
         UnsummonAllTotems();
@@ -13926,7 +13927,8 @@ void Player::_LoadDeclinedNames(QueryResult* result)
     Field *fields = result->Fetch();
     for(int i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
         m_declinedname->name[i] = fields[i].GetCppString();
-
+    
+    
     delete result;
 }
 
@@ -14614,7 +14616,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     }
 
     _LoadDeclinedNames(holder->GetResult(PLAYER_LOGIN_QUERY_LOADDECLINEDNAMES));
-
+    RemoveAurasDueToSpell(22650);
     return true;
 }
 
@@ -16639,7 +16641,18 @@ void Player::Uncharm()
         charm->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS_PET);
         charm->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
     }
-
+    if ( charm->GetEntry() == 60000 )
+    {
+      RemoveAurasDueToSpell(8326);
+      Creature * c = ObjectAccessor::GetCreature(*this,charm->GetGUID());
+      if ( c )
+      {
+        if ( c->isAlive() )
+          SetHealth(c->GetHealth());
+        RemoveAurasDueToSpell(22650);
+        
+      }
+    }
     if(GetCharmGUID())
     {
         sLog.outError("CRASH ALARM! Player %s is not able to uncharm unit (Entry: %u, Type: %u)", GetName(), charm->GetEntry(), charm->GetTypeId());

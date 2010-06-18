@@ -66,6 +66,16 @@ TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
     return NULL;
 }
 
+bool Creature::SetSpell(uint32 index, uint32 spellid)
+{
+  if ( index >= CREATURE_MAX_SPELLS )
+  {
+    sLog.outError("Invalid index on Creature::SetSpell : %d",index);
+    return false;
+  }
+  m_spells[index] = spellid;
+}
+
 bool VendorItemData::RemoveItem( uint32 item_id )
 {
     for(VendorItemList::iterator i = m_items.begin(); i != m_items.end(); ++i )
@@ -151,7 +161,7 @@ m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL),m_creatureInfo(NULL), m_DBTabl
 {
     m_valuesCount = UNIT_END;
 
-    for(int i =0; i<4; ++i)
+    for(int i =0; i<8; ++i)
         m_spells[i] = 0;
 
     m_CreatureSpellCooldowns.clear();
@@ -165,6 +175,14 @@ Creature::~Creature()
 {
     m_vendorItemCounts.clear();
 
+    if ( m_sharedVision.size() > 0 && GetEntry() == 60000 )// Previene il crash nel caso il server è andato in crash mentre il player era in ghost con lo spawn charmato
+    {
+      for ( SharedVisionList::iterator i = m_sharedVision.begin(); i != m_sharedVision.end(); i++)
+      {
+        (*i)->SetCharm(0);
+      }
+      m_sharedVision.clear();
+    }
     if(i_AI)
     {
         delete i_AI;
@@ -326,8 +344,17 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
     m_spells[1] = GetCreatureInfo()->spell2;
     m_spells[2] = GetCreatureInfo()->spell3;
     m_spells[3] = GetCreatureInfo()->spell4;
-
+    
     return true;
+}
+bool Creature::SetSpell(uint32 index, uint32 spellid)
+{
+  if ( index >= CREATURE_MAX_SPELLS )
+  {
+    sLog.outError("Invalid index on Creature::SetSpell : %d",index);
+    return false;
+  }
+  m_spells[index] = spellid;
 }
 
 bool Creature::UpdateEntry(uint32 Entry, uint32 team, const CreatureData *data )

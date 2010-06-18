@@ -449,7 +449,7 @@ class TRINITY_DLL_SPEC Creature : public Unit
         void Update( uint32 time );                         // overwrited Unit::Update
         void GetRespawnCoord(float &x, float &y, float &z, float* ori = NULL, float* dist =NULL) const;
         uint32 GetEquipmentId() const { return m_equipmentId; }
-
+        bool SetSpell(uint32 index, uint32 spellid );
         bool isPet() const { return m_isPet; }
         void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
         bool isTotem() const { return m_isTotem; }
@@ -512,7 +512,7 @@ class TRINITY_DLL_SPEC Creature : public Unit
         bool HasCategoryCooldown(uint32 spell_id) const;
 
         bool HasSpell(uint32 spellID) const;
-
+        bool SetSpell(uint32 index, uint32 spellid );
         bool UpdateEntry(uint32 entry, uint32 team=ALLIANCE, const CreatureData* data=NULL);
         bool UpdateStats(Stats stat);
         bool UpdateAllStats();
