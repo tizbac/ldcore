@@ -2125,9 +2125,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                   c->SetAttackTime(BASE_ATTACK,pl->GetAttackTime(BASE_ATTACK));
                   c->SetArmor(pl->GetArmor());
                   c->SetDisplayId(pl->GetDisplayId());
-                  c->SetSpeed(MOVE_RUN,pl->GetSpeed(MOVE_RUN));
+                  c->SetSpeed(MOVE_RUN,pl->GetSpeed(MOVE_RUN)*3.0);
                   c->SetSpeed(MOVE_RUN_BACK,pl->GetSpeed(MOVE_RUN_BACK));
-                  c->setFaction(pl->getFaction());
+                  c->setFaction(35);
                   c->SetLevel(pl->getLevel());
                   c->SetSpell(0,40314);//Aggiungi le spell 
                   c->SetSpell(1,40325);

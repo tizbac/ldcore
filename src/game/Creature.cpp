@@ -66,15 +66,6 @@ TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
     return NULL;
 }
 
-bool Creature::SetSpell(uint32 index, uint32 spellid)
-{
-  if ( index >= CREATURE_MAX_SPELLS )
-  {
-    sLog.outError("Invalid index on Creature::SetSpell : %d",index);
-    return false;
-  }
-  m_spells[index] = spellid;
-}
 
 bool VendorItemData::RemoveItem( uint32 item_id )
 {
