@@ -864,11 +864,21 @@ int32 Pet::GetTPForSpell(uint32 spellid)
 
 uint32 Pet::GetMaxLoyaltyPoints(uint32 level)
 {
+    if ( level < 1)
+    {
+      sLog.outError("Pet loyalty sottozero ( Pet : %s , Hunter: %s )",GetName(),GetOwner() ? GetOwner()->GetName() : "NULL");
+      return LevelUpLoyalty[0];
+    }
     return LevelUpLoyalty[level - 1];
 }
 
 uint32 Pet::GetStartLoyaltyPoints(uint32 level)
 {
+    if ( level < 1)
+    {
+      sLog.outError("Pet loyalty sottozero ( Pet : %s , Hunter: %s )",GetName(),GetOwner() ? GetOwner()->GetName() : "NULL");
+      return LevelStartLoyalty[0];
+    }
     return LevelStartLoyalty[level - 1];
 }
 
