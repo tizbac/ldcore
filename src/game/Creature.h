@@ -449,7 +449,6 @@ class TRINITY_DLL_SPEC Creature : public Unit
         void Update( uint32 time );                         // overwrited Unit::Update
         void GetRespawnCoord(float &x, float &y, float &z, float* ori = NULL, float* dist =NULL) const;
         uint32 GetEquipmentId() const { return m_equipmentId; }
-        bool SetSpell(uint32 index, uint32 spellid );
         bool isPet() const { return m_isPet; }
         void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
         bool isTotem() const { return m_isTotem; }
