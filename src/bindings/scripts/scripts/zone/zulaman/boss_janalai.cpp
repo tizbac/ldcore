@@ -440,14 +440,11 @@ struct TRINITY_DLL_DECL boss_janalaiAI : public ScriptedAI
 
         if(FireBreathTimer < diff)
         {
-            if(Unit* target = SelectUnit(SELECT_TARGET_RANDOM,0))
-            {
-                m_creature->AttackStop();
-                m_creature->GetMotionMaster()->Clear();
-                m_creature->CastSpell(target, SPELL_FLAME_BREATH, false);
-                m_creature->StopMoving();
-                isFlameBreathing = true;
-            }
+            		m_creature->AttackStop();
+		m_creature->GetMotionMaster()->Clear();
+		m_creature->CastSpell(m_creature, SPELL_FLAME_BREATH, false);
+	      m_creature->StopMoving();
+		isFlameBreathing = true;
             FireBreathTimer = 8000;
         }else FireBreathTimer -= diff;
     }
