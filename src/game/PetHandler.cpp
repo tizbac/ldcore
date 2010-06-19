@@ -89,7 +89,7 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
                     pet->InterruptNonMeleeSpells(false);
                     pet->GetMotionMaster()->MoveIdle();
                     charmInfo->SetCommandState( COMMAND_STAY );
-                    //pet->SetUInt32Value(UNIT_FIELD_BYTES_1, 1);
+                    pet->SetStandState(PLAYER_STATE_SIT);
 
                     charmInfo->SetIsCommandAttack(false);
                     charmInfo->SetIsAtStay(true);
@@ -102,7 +102,7 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
                     pet->InterruptNonMeleeSpells(false);
                     pet->GetMotionMaster()->MoveFollow(_player,PET_FOLLOW_DIST,pet->GetFollowAngle());
                     charmInfo->SetCommandState( COMMAND_FOLLOW );
-                    //pet->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+                    pet->SetStandState(PLAYER_STATE_NONE);
 
                     charmInfo->SetIsCommandAttack(false);
                     charmInfo->SetIsAtStay(false);
