@@ -281,7 +281,7 @@ struct TRINITY_DLL_DECL boss_gurtogg_bloodboilAI : public ScriptedAI
                 FelGeyserTimer = 30000;
             }else FelGeyserTimer -= diff;
 
-            if(m_creature->getVictim()->IsImmunedToDamage(SPELL_SCHOOL_MASK_ALL,true))
+            if(m_creature->getVictim() && m_creature->getVictim()->IsImmunedToDamage(SPELL_SCHOOL_MASK_ALL,true))
                 m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(),-100);
         }
 
