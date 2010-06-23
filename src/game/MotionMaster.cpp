@@ -240,18 +240,10 @@ MotionMaster::MoveChase(Unit* target, float dist, float angle)
     i_owner->clearUnitState(UNIT_STAT_FOLLOW);
     if(i_owner->GetTypeId() == TYPEID_PLAYER)
     {
-        DEBUG_LOG("Player (GUID: %u) chase to %s (GUID: %u)",
-            i_owner->GetGUIDLow(),
-            target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature",
-            target->GetTypeId() == TYPEID_PLAYER ? i_owner->GetGUIDLow() : ((Creature*)i_owner)->GetDBTableGUIDLow());
         Mutate(new TargetedMovementGenerator<Player>(*target,dist,angle), MOTION_SLOT_ACTIVE);
     }
     else
     {
-        DEBUG_LOG("Creature (Entry: %u GUID: %u) chase to %s (GUID: %u)",
-            i_owner->GetEntry(), i_owner->GetGUIDLow(),
-            target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature",
-            target->GetTypeId() == TYPEID_PLAYER ? target->GetGUIDLow() : ((Creature*)target)->GetDBTableGUIDLow());
         Mutate(new TargetedMovementGenerator<Creature>(*target,dist,angle), MOTION_SLOT_ACTIVE);
     }
 }
@@ -266,17 +258,10 @@ MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlot slo
     i_owner->addUnitState(UNIT_STAT_FOLLOW);
     if(i_owner->GetTypeId() == TYPEID_PLAYER)
     {
-        DEBUG_LOG("Player (GUID: %u) follow to %s (GUID: %u)", i_owner->GetGUIDLow(),
-            target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature",
-            target->GetTypeId() == TYPEID_PLAYER ? i_owner->GetGUIDLow() : ((Creature*)i_owner)->GetDBTableGUIDLow());
         Mutate(new TargetedMovementGenerator<Player>(*target,dist,angle), slot);
     }
     else
     {
-        DEBUG_LOG("Creature (Entry: %u GUID: %u) follow to %s (GUID: %u)",
-            i_owner->GetEntry(), i_owner->GetGUIDLow(),
-            target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature",
-            target->GetTypeId() == TYPEID_PLAYER ? target->GetGUIDLow() : ((Creature*)target)->GetDBTableGUIDLow());
         Mutate(new TargetedMovementGenerator<Creature>(*target,dist,angle), slot);
     }
 }

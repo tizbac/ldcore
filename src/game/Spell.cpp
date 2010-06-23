@@ -951,8 +951,9 @@ void Spell::doTriggers(SpellMissInfo missInfo, uint32 damage, SpellSchoolMask da
 
 void Spell::DoAllEffectOnTarget(TargetInfo *target)
 {
-    if (target->processed)                                  // Check target
+    if (!target || target->processed)                                  // Check target
         return;
+
     target->processed = true;                               // Target checked in apply effects procedure
 
     // Get mask of effects for target
@@ -3190,6 +3191,9 @@ void Spell::SendChannelUpdate(uint32 time)
         m_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT,0);
         m_caster->SetUInt32Value(UNIT_CHANNEL_SPELL,0);
     }
+
+    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+        return;
 
     WorldPacket data( MSG_CHANNEL_UPDATE, 8+4 );
     data.append(m_caster->GetPackGUID());

@@ -9299,6 +9299,12 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
 
     SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
 
+    if(m_currentSpells[CURRENT_GENERIC_SPELL] && m_currentSpells[CURRENT_GENERIC_SPELL]->getState() != SPELL_STATE_FINISHED)
+    {
+        if(m_currentSpells[CURRENT_GENERIC_SPELL]->m_spellInfo->Attributes & SPELL_ATTR_CANT_USED_IN_COMBAT)
+            InterruptSpell(CURRENT_GENERIC_SPELL);
+    }
+
     if(GetTypeId() != TYPEID_PLAYER && GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
         ((Creature*)this)->SetHomePosition(GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
 
@@ -10747,6 +10753,9 @@ void Unit::RemoveFromWorld()
 
 void Unit::CleanupsBeforeDelete()
 {
+    if(IsInWorld())
+        RemoveFromWorld();
+
     assert(m_uint32Values);
 
     //A unit may be in removelist and not in world, but it is still in grid
@@ -10761,9 +10770,6 @@ void Unit::CleanupsBeforeDelete()
     RemoveAllGameObjects();
     RemoveAllDynObjects();
     GetMotionMaster()->Clear(false);                    // remove different non-standard movement generators.
-
-    if(IsInWorld())
-        RemoveFromWorld();
 }
 
 void Unit::UpdateCharmAI()
