@@ -39,7 +39,7 @@ enum LogType
 const int LogType_count = int(LogError) +1;
 
 Log::Log() :
-    raLogfile(NULL), logfile(NULL), gmLogfile(NULL), charLogfile(NULL),
+    raLogfile(NULL), logfile(NULL), gmLogfile(NULL), charLogfile(NULL),itemLogFile(NULL),mailLogFile(NULL),
     dberLogfile(NULL), arenaLogFile(NULL), cheatLogFile(NULL), m_colored(false), m_includeTime(false), m_gmlog_per_account(false)
 {
     Initialize();
@@ -233,7 +233,9 @@ void Log::Initialize()
 
     cheatLogFile = openLogFile("CheatLogFile",NULL,"a");
     arenaLogFile = openLogFile("ArenaLogFile",NULL,"a");
-
+    itemLogFile = openLogFile("ItemLogFile",NULL,"a");
+    mailLogFile = openLogFile("MailLogFile",NULL,"a");
+    
     // Main log file settings
     m_includeTime  = sConfig.GetBoolDefault("LogTime", false);
     m_logLevel     = sConfig.GetIntDefault("LogLevel", 0);
@@ -514,6 +516,38 @@ void Log::outErrorDb( const char * err, ... )
         fflush(dberLogfile);
     }
     fflush(stderr);
+}
+void Log::outItem(const char* str, ... )
+{
+  if (!str)
+        return;
+
+  if(itemLogFile)
+  {
+      va_list ap;
+      outTimestamp(itemLogFile);
+      va_start(ap, str);
+      vfprintf(itemLogFile, str, ap);
+      fprintf(itemLogFile, "\n" );
+      va_end(ap);
+      fflush(itemLogFile);
+  }
+}
+void Log::outMail(const char* str, ... )
+{
+  if (!str)
+        return;
+
+  if(mailLogFile)
+  {
+      va_list ap;
+      outTimestamp(mailLogFile);
+      va_start(ap, str);
+      vfprintf(mailLogFile, str, ap);
+      fprintf(mailLogFile, "\n" );
+      va_end(ap);
+      fflush(mailLogFile);
+  }
 }
 
 void Log::outBasic( const char * str, ... )
