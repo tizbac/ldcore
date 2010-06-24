@@ -261,6 +261,16 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
     uint32 deliver_delay = needItemDelay ? sWorld.getConfig(CONFIG_MAIL_DELIVERY_DELAY) : 0;
 
     // will delete item or place to receiver mail list
+    sLog.outMail("Player '%s' IP '%s' GUID %llu SendMail To Account '%u' CharacterGuid: %llu, money : %u , COD : %u",_player->GetName(),_player->GetSession()->GetRemoteAddress().c_str(),_player->GetGUID(),
+    objmgr.GetPlayerAccountIdByGUID(rc),rc,money,COD);
+    sLog.outMail("\tItems: ");
+    for ( std::map<uint32,MailItem>::iterator it = mi.begin(); it != mi.end(); it++)
+    {
+      sLog.outMail("\t\t[%s]",(*it).second.item->GetProto()->Name1);
+    }
+    //sLog.outMail("\tBody: "); // TODO: Da verificare se è legale in Italia
+    //sLog.outMail("%s",body.c_str());
+    sLog.outMail("=====END======");
     WorldSession::SendMailTo(receive, MAIL_NORMAL, MAIL_STATIONERY_NORMAL, pl->GetGUIDLow(), GUID_LOPART(rc), subject, itemTextId, &mi, money, COD, MAIL_CHECK_MASK_NONE, deliver_delay);
 
     CharacterDatabase.BeginTransaction();

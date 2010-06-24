@@ -115,6 +115,8 @@ class Log : public Trinity::Singleton<Log, Trinity::ClassLevelLockable<Log, ZThr
                                                             // any log level
         void outChar( const char * str, ... )        ATTR_PRINTF(2,3);
                                                             // any log level
+        void outMail( const char * str, ... ) ATTR_PRINTF(2,3);                                                        
+        void outItem( const char * str, ... ) ATTR_PRINTF(2,3);                                              
         void outCharDump( const char * str, uint32 account_id, uint32 guid, const char * name );
         void outRALog( const char * str, ... )       ATTR_PRINTF(2,3);
         void outArena( const char * str, ... )       ATTR_PRINTF(2,3);
@@ -141,7 +143,8 @@ class Log : public Trinity::Singleton<Log, Trinity::ClassLevelLockable<Log, ZThr
         FILE* dberLogfile;
         FILE* arenaLogFile;
         FILE* cheatLogFile;
-
+        FILE* itemLogFile;
+        FILE* mailLogFile;
         // log/console control
         uint32 m_logLevel;
         uint32 m_logFileLevel;

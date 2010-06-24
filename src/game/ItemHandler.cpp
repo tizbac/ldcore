@@ -288,7 +288,12 @@ void WorldSession::HandleDestroyItemOpcode( WorldPacket & recv_data )
         _player->SendEquipError( EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
         return;
     }
-
+    if ( pItem->GetProto() && _player->GetSession() && pItem->GetProto()->Quality > 3 )
+    {
+      sLog.outItem("Player '%s' GUID: %llu , IP: '%s' -> DESTROY ITEM [%s] : Entry = %u , ItemInstance: %llu , Count: %u, Quality: %u",_player->GetName(),_player->GetGUID(),_player->GetSession()->GetRemoteAddress().c_str(),
+                  pItem->GetProto()->Name1,pItem->GetEntry(),pItem->GetGUID(),pItem->GetCount(),pItem->GetProto()->Quality);
+      sLog.outItem("\tItemInstance %llu Charges = %u , Soulbound: %s ",pItem->GetGUID(),pItem->GetSpellCharges(),pItem->IsSoulBound() ? "True" : "False" );
+    }
     if(count)
     {
         uint32 i_count = count;
@@ -296,6 +301,8 @@ void WorldSession::HandleDestroyItemOpcode( WorldPacket & recv_data )
     }
     else
         _player->DestroyItem( bag, slot, true );
+    
+    
 }
 
 // Only _static_ data send in this packet !!!
@@ -606,8 +613,18 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
                     pItem->RemoveFromUpdateQueueOf(_player);
                     _player->AddItemToBuyBackSlot( pItem );
                 }
-
+                
+                if ( pItem->GetProto() && _player->GetSession() && pItem->GetProto()->Quality > 3)
+                {
+                  sLog.outItem("Player '%s' GUID: %llu , IP: '%s' -> SELL ITEM [%s] : Entry = %u , ItemInstance: %llu , Count: %u, Quality: %u",_player->GetName(),_player->GetGUID(),_player->GetSession()->GetRemoteAddress().c_str(),
+                              pItem->GetProto()->Name1,pItem->GetEntry(),pItem->GetGUID(),pItem->GetCount(),pItem->GetProto()->Quality);
+                  sLog.outItem("\tItemInstance %llu Charges = %u , Soulbound: %s",pItem->GetGUID(),pItem->GetSpellCharges(),pItem->IsSoulBound() ? "True" : "False" );
+                }
+                
+                
                 _player->ModifyMoney( pProto->SellPrice * count );
+                
+                
             }
             else
                 _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
@@ -658,6 +675,12 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
             _player->RemoveItemFromBuyBackSlot( slot, false );
             _player->ItemAddedQuestCheck( pItem->GetEntry(), pItem->GetCount());
             _player->StoreItem( dest, pItem, true );
+             if ( pItem->GetProto() && _player->GetSession() && pItem->GetProto()->Quality > 3)
+            {
+              sLog.outItem("Player '%s' GUID: %llu , IP: '%s' -> BUYBACK [%s] : Entry = %u , ItemInstance: %llu , Count: %u, Quality: %u",_player->GetName(),_player->GetGUID(),_player->GetSession()->GetRemoteAddress().c_str(),
+                          pItem->GetProto()->Name1,pItem->GetEntry(),pItem->GetGUID(),pItem->GetCount(),pItem->GetProto()->Quality);
+              sLog.outItem("\tItemInstance %llu  Charges = %u , Soulbound: %s",pItem->GetGUID(),pItem->GetSpellCharges(),pItem->IsSoulBound() ? "True" : "False" );
+            }
         }
         else
             _player->SendEquipError( msg, pItem, NULL );

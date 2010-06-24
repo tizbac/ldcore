@@ -80,6 +80,7 @@
 #define SKILL_TEMP_BONUS(x)    int16(PAIR32_LOPART(x))
 #define SKILL_PERM_BONUS(x)    int16(PAIR32_HIPART(x))
 #define MAKE_SKILL_BONUS(t, p) MAKE_PAIR32(t,p)
+#include "InstanceData.h"
 
 enum CharacterFlags
 {
@@ -3922,6 +3923,25 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
                 }
             }
         }
+    }
+    if ( GetMap() && GetMap()->IsDungeon() && GetInstanceData() )
+    {
+      if ( GetInstanceData()->IsEncounterInProgress() )
+      {
+        Group * group = GetGroup();
+        if ( group )
+        {
+          for(GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+          {
+            Player * p = itr->getSource();
+            if ( p->getVictim() )
+            {
+              SetInCombatWith(p->getVictim());
+              break;
+            }
+          }
+        }
+      }
     }
 }
 
