@@ -535,6 +535,9 @@ inline bool CreatureAI::UpdateCombatState()
 
 inline bool CreatureAI::UpdateVictim()
 {
+    if(!me)
+        return false;
+
     if(!me->isInCombat())
         return false;
 
