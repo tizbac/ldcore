@@ -603,7 +603,7 @@ struct TRINITY_DLL_DECL boss_essence_of_angerAI : public boss_soul_essenceAI
         case 1: DoScriptText(ANGER_SAY_FREED2, m_creature); break;
         }
 
-        DoZoneInCombat();
+        //DoZoneInCombat();
         DoCast(m_creature, AURA_OF_ANGER, true);
     }
 
@@ -635,11 +635,13 @@ struct TRINITY_DLL_DECL boss_essence_of_angerAI : public boss_soul_essenceAI
 
         if(CheckTankTimer < diff)
         {
-            if(m_creature->getVictim()->GetGUID() != AggroTargetGUID)
+            Unit * u;
+            u = SelectUnit(SELECT_TARGET_TOPAGGRO, 0);
+            if(u && u->GetGUID() != AggroTargetGUID)
             {
                 DoScriptText(ANGER_SAY_BEFORE, m_creature);
                 DoCast(m_creature, SPELL_SELF_SEETHE, true);
-                AggroTargetGUID = m_creature->getVictim()->GetGUID();
+                AggroTargetGUID = SelectUnit(SELECT_TARGET_TOPAGGRO, 0)->GetGUID();
             }
             CheckTankTimer = 2000;
         }else CheckTankTimer -= diff;

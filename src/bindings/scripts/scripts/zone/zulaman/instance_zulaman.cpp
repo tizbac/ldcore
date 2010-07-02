@@ -278,7 +278,12 @@ struct TRINITY_DLL_DECL instance_zulaman : public ScriptedInstance
             break;
         case DATA_JANALAIEVENT:
             Encounters[2] = data;
-            if(data == DONE) SummonHostage(2);
+            if(data == DONE){
+              SummonHostage(2);
+              OpenDoor(HalazziExitDoorGUID, true);
+              
+              
+            }
             break;
         case DATA_HALAZZIEVENT:
             Encounters[3] = data;
