@@ -334,7 +334,18 @@ void Spell::SpellDamageSchoolDmg(uint32 effect_idx)
                 //Gore
                 if(m_spellInfo->SpellIconID == 2269 )
                 {
-                  damage+= (uint32)unitTarget->GetMap()->rand32()%2 ? damage : 0;
+                   damage = uint32(damage * (m_caster->GetTotalAttackPowerValue(BASE_ATTACK)) / 100 * 0.75);
+                  damage += (uint32)unitTarget->GetMap()->rand32()%2 ? damage : 0;
+                }
+                //Claw
+                if(m_spellInfo->SpellIconID == 262 && m_spellInfo->SpellVisual == 6762 )
+                {
+                    damage = uint32(damage * (m_caster->GetTotalAttackPowerValue(BASE_ATTACK)) / 100 * 0.75);
+                }
+                //Bite
+                if(m_spellInfo->SpellIconID == 146 && m_spellInfo->SpellVisual == 376)
+                {
+                    damage = uint32(damage * (m_caster->GetTotalAttackPowerValue(BASE_ATTACK)) / 100 * 0.75);
                 }
 
                 // Meteor like spells (divided damage to targets)

@@ -637,8 +637,8 @@ void Spell::prepareDataForTriggerSystem()
         m_canTrigger = false;         // Triggered spells can`t trigger another
         switch (m_spellInfo->SpellFamilyName)
         {
-            case SPELLFAMILY_MAGE:    // Arcane Missles / Blizzard triggers need do it
-                if (m_spellInfo->SpellFamilyFlags & 0x0000000000200080LL) m_canTrigger = true;
+            case SPELLFAMILY_MAGE:    // Arcane Missles / Blizzard / Molten Armor triggers need do it
+                if (m_spellInfo->SpellFamilyFlags & 0x0000000800000000LL) m_canTrigger = true;
             break;
             case SPELLFAMILY_WARLOCK: // For Hellfire Effect / Rain of Fire / Seed of Corruption triggers need do it
                 if (m_spellInfo->SpellFamilyFlags & 0x0000800000000060LL) m_canTrigger = true;
@@ -699,6 +699,10 @@ void Spell::prepareDataForTriggerSystem()
     // Gives your Immolation Trap, Frost Trap, Explosive Trap, and Snake Trap ....
     if (m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && m_spellInfo->SpellFamilyFlags & 0x0000200000000014LL)
         m_procAttacker |= PROC_FLAG_ON_TRAP_ACTIVATION;
+    // Priest Shadow Word : Death (for Blackout trigger)
+    // Should not proc on self damage
+    if (m_spellInfo->Id == 32409 && m_caster == m_targets.getUnitTarget())
+      m_canTrigger = false;
 }
 
 void Spell::CleanupTargetList()

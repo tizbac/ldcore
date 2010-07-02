@@ -4142,6 +4142,13 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
                     m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 3 / 100);
                 return;
             }
+            //Scorpid Poison
+            if(m_spellProto->SpellIconID == 163 && m_spellProto->DmgClass == 2)
+            {
+                if (apply && !loading && caster)
+                      m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 2 / 100);
+                  return;
+            }
             break;
         }
         case SPELLFAMILY_WARRIOR:

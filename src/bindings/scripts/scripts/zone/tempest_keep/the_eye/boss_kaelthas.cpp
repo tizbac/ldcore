@@ -202,11 +202,10 @@ struct TRINITY_DLL_DECL advisorbase_ai : public ScriptedAI
 
     void Revive(Unit* Target)
     {
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, 524288);
-        m_creature->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         m_creature->SetHealth(m_creature->GetMaxHealth());
         m_creature->setFaction(m_creature->getFaction());
-        m_creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+        m_creature->SetStandState(PLAYER_STATE_NONE);
         DoCast(m_creature, SPELL_RES_VISUAL, false);
         DelayRes_Timer = 2000;
         DoZoneInCombat();
@@ -231,7 +230,7 @@ struct TRINITY_DLL_DECL advisorbase_ai : public ScriptedAI
             FakeDeath = true;
 
             m_creature->InterruptNonMeleeSpells(false);
-            m_creature->SetHealth(0);
+            m_creature->SetHealth(1);
             m_creature->ClearComboPointHolders();
             m_creature->RemoveAllAurasOnDeath();
             m_creature->ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
@@ -241,7 +240,7 @@ struct TRINITY_DLL_DECL advisorbase_ai : public ScriptedAI
             m_creature->SetUInt64Value(UNIT_FIELD_TARGET,0);
             m_creature->GetMotionMaster()->Clear();
             m_creature->GetMotionMaster()->MoveIdle();
-            m_creature->SetUInt32Value(UNIT_FIELD_BYTES_1,PLAYER_STATE_DEAD);
+            m_creature->SetStandState(PLAYER_STATE_DEAD);
 
             if (pInstance->GetData(DATA_KAELTHASEVENT) == 3)
                 JustDied(pKiller);
@@ -282,6 +281,12 @@ struct TRINITY_DLL_DECL boss_kaelthasAI : public ScriptedAI
         AdvisorGuid[1] = 0;
         AdvisorGuid[2] = 0;
         AdvisorGuid[3] = 0;
+        SpellEntry *TempSpell = (SpellEntry*)GetSpellStore()->LookupEntry(SPELL_PYROBLAST);
+        if(TempSpell)
+        {
+            TempSpell->EffectImplicitTargetA[0] = 6;
+            TempSpell->EffectImplicitTargetB[0] = 0;
+        }
     }
 
     ScriptedInstance* pInstance;
@@ -885,9 +890,12 @@ struct TRINITY_DLL_DECL boss_kaelthasAI : public ScriptedAI
                         {
                             //Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 0);
                             //DoCast(target, SPELL_PYROBLAST);
-                            m_creature->CastSpell(SelectUnit(SELECT_TARGET_TOPAGGRO, 0), SPELL_PYROBLAST, false);                     
+                            Unit* target = SelectUnit(SELECT_TARGET_TOPAGGRO, 0);
+                            if ( target )
+                              DoCast(target, SPELL_PYROBLAST);                   
                             ++PyrosCasted;
 
+                            
                             Check_Timer = 4400;
                         }else Check_Timer -= diff;
                         if(PyrosCasted > 3)

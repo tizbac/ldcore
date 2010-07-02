@@ -1595,6 +1595,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2, bool
                     case SPELL_AURA_OBS_MOD_MANA:
                     case SPELL_AURA_OBS_MOD_HEALTH:
                         return false;
+                     //Judgement of Wisdom and Judgement of Light from different casters should stack                     
+                    case SPELL_AURA_PROC_TRIGGER_SPELL:
+                        if (spellInfo_1->SpellFamilyFlags & 0x0000000000080000LL && spellInfo_1->SpellFamilyName == SPELLFAMILY_PALADIN)
+                           return false;
                     default:
                         break;
                 }

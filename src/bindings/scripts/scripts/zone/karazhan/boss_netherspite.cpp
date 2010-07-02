@@ -123,9 +123,13 @@ struct TRINITY_DLL_DECL boss_netherspiteAI : public ScriptedAI
         NetherbreathTimer = 3000;
 
         HandleDoors(true);
+        m_creature->RemoveAllAuras();
         DestroyPortals();
     }
-
+    void EnterCombat(Unit *who)
+    {
+          DoCast(m_creature, SPELL_NETHERBURN_AURA);
+    }
     void SummonPortals()
     {
         uint8 r = rand()%4;
