@@ -440,7 +440,7 @@ public:
             .def ( "SetFlag",&Creature::SetFlag )
             .def ( "HasFlag",&Creature::HasFlag )
             .def ( "ForcedDespawn", &Creature::ForcedDespawn )
-            .def ( "Respawn" &Creature::Respawn )
+            .def ( "Respawn" , &Creature::Respawn )
             .def ( "RemoveAllAuras", &Creature::RemoveAllAuras)
             .def ( "ToggleFlag", ( void ( Creature::* ) ( uint16,uint32 ) ) &Creature::ToggleFlag )
             .def ( "RemoveFlag",&Creature::RemoveFlag )
