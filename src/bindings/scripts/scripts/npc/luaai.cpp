@@ -76,6 +76,7 @@ LuaAI * L_CastToLuaAI ( ScriptedAI * ai )
     return ( LuaAI* ) ai;
 
 }
+
 CreatureAI * L_CastToCreatureAI ( ScriptedAI * ai )
 {
     return ( CreatureAI* ) ai;
@@ -88,6 +89,10 @@ Player* L_Unit2Player ( Unit* u )
     else
         return ( Player* ) u;
 
+}
+WorldObject * L_CastToWorldObject( Unit * u)
+{
+  return (WorldObject*)u;
 }
 std::string L_GetLuaDir()
 {
@@ -212,7 +217,21 @@ public:
             luabind::def ( "NullGuid",NullGuid ),
             luabind::class_<uint64> ( "uint64" ),
             luabind::class_<UnitAI> ( "UnitAI" ),
-            luabind::class_<CreatureAI,UnitAI> ( "CreatureAI" ),
+            luabind::class_<CreatureAI,UnitAI> ( "CreatureAI" )
+            .def ( "DoZoneInCombat", &CreatureAI::DoZoneInCombat )
+            .def ( "DoSpellAttackIfReady", &CreatureAI::DoSpellAttackIfReady )
+            .def ( "DoCast" , ( void ( CreatureAI::* ) ( Unit*,uint32,bool ) ) &CreatureAI::DoCast )
+            .def ( "DoCastAOE" , &CreatureAI::DoCastAOE )
+            .def ( "AttackStart" , ( void ( ScriptedAI::* ) ( Unit*,bool ) ) &ScriptedAI::AttackStart )
+            .def ( "DoGetSpellMaxRange", &CreatureAI::DoGetSpellMaxRange )
+            .def ( "DoAction", &CreatureAI::DoAction )
+            .def ( "AttackStartCaster" , &CreatureAI::AttackStartCaster )
+            .def ( "DoMeleeAttackIfReady" , &CreatureAI::DoMeleeAttackIfReady )
+            .def ( "GetData", &CreatureAI::GetData )
+            .def ( "FillAISpellInfo" , &CreatureAI::FillAISpellInfo )
+            .def ( "GetGUID" , &CreatureAI::GetGUID )
+            .def ( "EnterEvadeMode", &CreatureAI::EnterEvadeMode )
+            ,
             
             luabind::class_<CleanDamage> ("CleanDamage"),
             luabind::class_<ScriptedAI,CreatureAI> ( "ScriptedAI" )
@@ -396,6 +415,7 @@ public:
             .def ( "SetFlag",&Creature::SetFlag )
             .def ( "GetGUID",&Creature::GetGUID )
             .def ( "GetNpcTextId",&Creature::GetNpcTextId )
+            .def ( "GetAI",&Creature::AI )
             .def ( "GetName",&Creature::GetName )
             .def ( "CastSpell", ( void ( Creature::* ) ( Unit*,uint32,bool,Item*,Aura*,uint64 ) ) &Unit::CastSpell )
             .def ( "GetHealth",&Creature::GetHealth )
@@ -416,8 +436,11 @@ public:
             .def ( "HasAuraType",&Creature::HasAuraType )
             .def ( "HasAura",&Creature::HasAura )
             .def ( "setFaction",&Creature::setFaction )
+            .def ( "getFaction",&Creature::getFaction )
             .def ( "SetFlag",&Creature::SetFlag )
             .def ( "HasFlag",&Creature::HasFlag )
+            .def ( "ForcedDespawn", &Creature::ForcedDespawn )
+            .def ( "Respawn" &Creature::Respawn )
             .def ( "RemoveAllAuras", &Creature::RemoveAllAuras)
             .def ( "ToggleFlag", ( void ( Creature::* ) ( uint16,uint32 ) ) &Creature::ToggleFlag )
             .def ( "RemoveFlag",&Creature::RemoveFlag )
@@ -442,11 +465,12 @@ public:
             luabind::def ( "DoScriptText" , &DoScriptText),
             luabind::def ( "GetUnit" , &Unit::GetUnit),
             luabind::def ( "SystemMessage", &lua_sysmsg),
+            luabind::def ( "ToWorldObject",&L_CastToWorldObject),
             luabind::def ( "GetLuaDir", &L_GetLuaDir ),
             luabind::def ( "GetClosestCreatureWithEntry" , &GetClosestCreatureWithEntry),
             //luabind::def ( "GetClosestDeadCreature" , &GetClosestDeadCreature),
             luabind::def ( "GetCreature" , &ObjectAccessor::GetCreature ),
-            luabind::def ( "GetGameObject" , &ObjectAccessor::GetGameObject ),
+            luabind::def ( "GetGameObjt" , &ObjectAccessor::GetGameObject ),
             luabind::def ( "GetPlayer" , &ObjectAccessor::GetPlayer ),
             luabind::def ( "FindPlayerByName" , &ObjectAccessor::FindPlayerByName ),
             luabind::def ( "GetUnit" , &ObjectAccessor::GetUnit )
