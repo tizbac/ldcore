@@ -82,6 +82,30 @@ CreatureAI * L_CastToCreatureAI ( ScriptedAI * ai )
     return ( CreatureAI* ) ai;
 
 }
+float L_GetCreatureHPX ( Creature * c)
+{
+    float x,y,z,o;
+    if ( ! c )
+        return 0.0;
+    c->GetHomePosition(x,y,z,o);
+    return x;
+}
+float L_GetCreatureHPY ( Creature * c)
+{
+    float x,y,z,o;
+    if ( ! c )
+        return 0.0;
+    c->GetHomePosition(x,y,z,o);
+    return y;
+}
+float L_GetCreatureHPZ ( Creature * c)
+{
+    float x,y,z,o;
+    if ( ! c )
+        return 0.0;
+    c->GetHomePosition(x,y,z,o);
+    return z;
+}
 Player* L_Unit2Player ( Unit* u )
 {
     if ( ! u->GetTypeId() == TYPEID_PLAYER )
@@ -473,7 +497,10 @@ public:
             luabind::def ( "GetGameObjt" , &ObjectAccessor::GetGameObject ),
             luabind::def ( "GetPlayer" , &ObjectAccessor::GetPlayer ),
             luabind::def ( "FindPlayerByName" , &ObjectAccessor::FindPlayerByName ),
-            luabind::def ( "GetUnit" , &ObjectAccessor::GetUnit )
+            luabind::def ( "GetUnit" , &ObjectAccessor::GetUnit ),
+            luabind::def ( "GetCreatureHomeX", &L_GetCreatureHPX ),
+            luabind::def ( "GetCreatureHomeY", &L_GetCreatureHPY ),
+            luabind::def ( "GetCreatureHomeZ", &L_GetCreatureHPZ )
             //def("DoZoneInCombat", &func)
         ];
        
