@@ -575,15 +575,14 @@ struct TRINITY_DLL_DECL boss_essence_of_angerAI : public boss_soul_essenceAI
     uint32 CheckTankTimer;
     uint32 SoulScreamTimer;
     uint32 SpiteTimer;
-    uint32 WaitTimer;
+
     std::list<uint64> SpiteTargetGUID;
 
     bool CheckedAggro;
-    bool First;
+
     void Reset()
     {
         AggroTargetGUID = 0;
-        WaitTimer = 20000;
         CheckTankTimer = 5000;
         SoulScreamTimer = 10000;
         SpiteTimer = 30000;
@@ -591,7 +590,6 @@ struct TRINITY_DLL_DECL boss_essence_of_angerAI : public boss_soul_essenceAI
         SpiteTargetGUID.clear();
 
         CheckedAggro = false;
-        First = false;
         boss_soul_essenceAI::Reset();
     }
 
@@ -604,7 +602,7 @@ struct TRINITY_DLL_DECL boss_essence_of_angerAI : public boss_soul_essenceAI
         }
 
         //DoZoneInCombat();
-        //DoCast(m_creature, AURA_OF_ANGER, true);
+        DoCast(m_creature, AURA_OF_ANGER, true);
     }
 
     void JustDied(Unit *victim)
@@ -632,7 +630,7 @@ struct TRINITY_DLL_DECL boss_essence_of_angerAI : public boss_soul_essenceAI
             AggroTargetGUID = m_creature->getVictim()->GetGUID();
             CheckedAggro = true;
         }
-
+	  /*
         if(CheckTankTimer < diff)
         {
             Unit * u;
@@ -645,7 +643,7 @@ struct TRINITY_DLL_DECL boss_essence_of_angerAI : public boss_soul_essenceAI
             }
             CheckTankTimer = 2000;
         }else CheckTankTimer -= diff;
-
+	  */
         if(SoulScreamTimer < diff)
         {
             DoCast(m_creature->getVictim(), SPELL_SOUL_SCREAM);
@@ -655,15 +653,6 @@ struct TRINITY_DLL_DECL boss_essence_of_angerAI : public boss_soul_essenceAI
                 DoScriptText(ANGER_SAY_SPEC, m_creature);
             }
         }else SoulScreamTimer -= diff;
-        
-        if(WaitTimer < diff)
-        {
-               if(!First)
-               {
-               DoCast(m_creature, AURA_OF_ANGER, true);
-               First = false;
-            }
-        }else WaitTimer -= diff;
         
         if(SpiteTimer < diff)
         {
