@@ -1024,6 +1024,12 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
                 maxdamage = maxdamage * 0.75;
                 break;
         }
+	  //Cobra Reflexes
+        if(HasAura(25076, 0))
+        {
+        	mindamage = mindamage * 0.85;
+       	maxdamage = maxdamage * 0.85;
+        }
     }
 
     SetStatFloatValue(UNIT_FIELD_MINDAMAGE, mindamage);
