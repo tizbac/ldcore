@@ -81,7 +81,7 @@ float World::m_MaxVisibleDistanceForObject    = DEFAULT_VISIBILITY_DISTANCE;
 float World::m_MaxVisibleDistanceInFlight     = DEFAULT_VISIBILITY_DISTANCE;
 float World::m_VisibleUnitGreyDistance        = 0;
 float World::m_VisibleObjectGreyDistance      = 0;
-
+bool trinitycore2realmd = false;
 // ServerMessages.dbc
 enum ServerMessageType
 {
@@ -434,7 +434,7 @@ void World::LoadConfigSettings(bool reload)
 
     ///- Get string for new logins (newly created characters)
     SetNewCharString(sConfig.GetStringDefault("PlayerStart.String", ""));
-
+    trinitycore2realmd = sConfig.GetBoolDefault("TC2Realmd",false);
     ///- Send server info on login?
     m_configs[CONFIG_ENABLE_SINFO_LOGIN] = sConfig.GetIntDefault("Server.LoginInfo", 0);
 

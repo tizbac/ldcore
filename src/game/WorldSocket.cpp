@@ -69,7 +69,7 @@ struct ClientPktHeader
 #else
 #pragma pack(pop)
 #endif
-
+extern bool trinitycore2realmd;
 WorldSocket::WorldSocket (void) :
 WorldHandler (),
 m_Session (0),
@@ -681,8 +681,29 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     std::string safe_account = account; // Duplicate, else will screw the SHA hash verification below
     LoginDatabase.escape_string (safe_account);
     // No SQL injection, username escaped.
-
-    QueryResult *result =
+    QueryResult * result;
+    if ( trinitycore2realmd )
+    {
+      result =
+           LoginDatabase.PQuery ("SELECT "
+                                "a.id, " //0
+                                "aa.gmlevel, " //1
+                                "a.sessionkey, " //2
+                                "a.last_ip, " //3
+                                "a.locked, " //4
+                                "sha_pass_hash, " //5
+                                "a.v, " //6
+                                "a.s, " //7
+                                "a.expansion, " //8
+                                "a.mutetime, " //9
+                                "a.locale " //10
+                                "FROM account AS a LEFT JOIN account_access as aa ON a.id = aa.id "
+                                "WHERE username = '%s'",
+                                safe_account.c_str ());
+    }
+    else{
+      
+    result =
           LoginDatabase.PQuery ("SELECT "
                                 "id, " //0
                                 "gmlevel, " //1
@@ -698,6 +719,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
                                 "FROM account "
                                 "WHERE username = '%s'",
                                 safe_account.c_str ());
+    }
 
     // Stop if the account is not found
     if (!result)
