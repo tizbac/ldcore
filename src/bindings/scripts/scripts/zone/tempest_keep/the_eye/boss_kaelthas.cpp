@@ -204,7 +204,7 @@ struct TRINITY_DLL_DECL advisorbase_ai : public ScriptedAI
 
     void Revive(Unit* Target)
     {
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         m_creature->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
         m_creature->SetHealth(m_creature->GetMaxHealth());
         m_creature->setFaction(m_creature->getFaction());
@@ -1202,7 +1202,7 @@ struct TRINITY_DLL_DECL boss_lord_sanguinarAI : public advisorbase_ai
         advisorbase_ai::UpdateAI(diff);
 
         //Faking death, don't do anything
-        if (FakeDeath)DoResetThreat();
+        if (FakeDeath)
             return;
 
         //Return since we have no target
