@@ -1244,14 +1244,22 @@ void Aura::HandleAddModifier(bool apply, bool Real)
 
     if (apply)
     {
-        // Add custom charges for some mod aura
+        
         switch (m_spellProto->Id)
         {
+        	// Add custom charges for some mod aura
             case 17941:    // Shadow Trance
             case 22008:    // Netherwind Focus
             case 34936:    // Backlash
                 m_procCharges = 1;
                 break;
+            
+            // Add custom values for some mod aura
+            case 32381:    // Empowered Corruption Rank 1
+            case 32382:    // Empowered Corruption Rank 2
+            case 32383:    // Empowered Corruption Rank 3
+                m_modifier.m_amount *= 6;
+                break;             
         }
 
         SpellModifier *mod = new SpellModifier;
