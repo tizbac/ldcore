@@ -199,7 +199,7 @@ struct TRINITY_DLL_DECL boss_teron_gorefiendAI : public ScriptedAI
     {
         pInstance = ((ScriptedInstance*)c->GetInstanceData());
     }
-
+    std::map<uint64,uint32> removeghosttimers;
     ScriptedInstance* pInstance;
 
     uint32 IncinerateTimer;
@@ -227,7 +227,7 @@ struct TRINITY_DLL_DECL boss_teron_gorefiendAI : public ScriptedAI
         CrushingShadowsTimer = 22000;
         SummonShadowsTimer = 60000;
         RandomYellTimer = 50000;
-
+        ShadowOfDeathTimer = 15000;
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         // Start off unattackable so that the intro is done properly
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -331,8 +331,12 @@ struct TRINITY_DLL_DECL boss_teron_gorefiendAI : public ScriptedAI
         Unit* Ghost = NULL;
         if(GhostGUID)
             Ghost = Unit::GetUnit((*m_creature), GhostGUID);
-        if(Ghost && Ghost->isAlive() && Ghost->HasAura(SPELL_SHADOW_OF_DEATH, 0))
+        
+        if(Ghost && Ghost->GetTypeId() == TYPEID_PLAYER && Ghost->isAlive() && Ghost->HasAura(22650, 0))
         {
+            Player * plr = (Player*)Ghost;
+           // plr->TeleportTo(564,530.722473,422.617798,193.201523,5.3988);
+            removeghosttimers[plr->GetGUID()] = 60000;
             /*float x,y,z;
             Ghost->GetPosition(x,y,z);
             Creature* control = m_creature->SummonCreature(CREATURE_GHOST, x, y, z, 0, TEMPSUMMON_TIMED_DESAWN, 30000);
@@ -342,6 +346,7 @@ struct TRINITY_DLL_DECL boss_teron_gorefiendAI : public ScriptedAI
                 Ghost->DealDamage(Ghost, Ghost->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL,
             false);
             }*/
+            
             for(uint8 i = 0; i < 4; ++i)
             {
                 Creature* Construct = NULL;
@@ -351,8 +356,9 @@ struct TRINITY_DLL_DECL boss_teron_gorefiendAI : public ScriptedAI
                 if(Construct)
                 {
                     Construct->CastSpell(Construct, SPELL_PASSIVE_SHADOWFORM, true);
-                    SetThreatList(Construct);               // Use same function as Doom Blossom to set Threat List.
-                    ((mob_shadowy_constructAI*)Construct->AI())->GhostGUID = GhostGUID;
+                    SetThreatList(Construct);
+                    if (Construct->GetScriptName() == "mob_shadowy_construct" )// Use same function as Doom Blossom to set Threat List.
+                      ((mob_shadowy_constructAI*)Construct->AI())->GhostGUID = GhostGUID;
                     Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 1);
                     if(!target)                             // someone's trying to solo.
                         target = m_creature->getVictim();
@@ -394,10 +400,10 @@ struct TRINITY_DLL_DECL boss_teron_gorefiendAI : public ScriptedAI
         if(!UpdateVictim() || Intro)
             return;
 
-        if(SummonShadowsTimer < diff)
+        /*if(SummonShadowsTimer < diff)
         {
             //MindControlGhost();
-
+            
             for(uint8 i = 0; i < 2; ++i)
             {
                 Creature* Shadow = NULL;
@@ -412,10 +418,33 @@ struct TRINITY_DLL_DECL boss_teron_gorefiendAI : public ScriptedAI
                     if(target)
                         Shadow->AI()->AttackStart(target);
                 }
-            }
+            }*
             SummonShadowsTimer = 60000;
-        }else SummonShadowsTimer -= diff;
-
+        }else SummonShadowsTimer -= diff;*/
+        std::vector<uint64> removelist;
+        for ( std::map<uint64,uint32>::iterator it = removeghosttimers.begin(); it != removeghosttimers.end(); it++ )
+        {
+          Unit * u = ObjectAccessor::GetUnit(*m_creature,(*it).first);
+          if ( u )
+          {
+            if ( (*it).second <= diff )
+            {
+              u->RemoveAurasDueToSpell(22650);
+              removelist.push_back(u->GetGUID());
+              
+            }else{
+              removeghosttimers[u->GetGUID()]-=diff;
+            }
+          }else{
+            removelist.push_back(u->GetGUID());
+          }
+        }
+        
+        for ( std::vector<uint64>::iterator it = removelist.begin(); it != removelist.end(); it++)
+        {
+          m_creature->Say("remove ghost from player",0,0);
+          removeghosttimers.erase(*it);
+        }
         if(SummonDoomBlossomTimer < diff)
         {
             if (Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 0))
@@ -466,21 +495,20 @@ struct TRINITY_DLL_DECL boss_teron_gorefiendAI : public ScriptedAI
         }else CrushingShadowsTimer -= diff;
 
         /*** NOTE FOR FUTURE DEV: UNCOMMENT BELOW ONLY IF MIND CONTROL IS FULLY IMPLEMENTED **/
-        /*if(ShadowOfDeathTimer < diff)
+        if(ShadowOfDeathTimer < diff)
         {
             Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 1);
 
             if(!target)
                target = m_creature->getVictim();
 
-            if(target && target->isAlive() && target->GetTypeId() == TYPEID_PLAYER)
+            if(target && target->isAlive() && target->GetTypeId() == TYPEID_PLAYER && ! target->HasAura(SPELL_SHADOW_OF_DEATH,0) && ! target->HasAura(22650,0))
             {
-                DoCast(target, SPELL_SHADOW_OF_DEATH);
-                GhostGUID = target->GetGUID();
+                target->CastSpell(target, SPELL_SHADOW_OF_DEATH,true);
                 ShadowOfDeathTimer = 30000;
-                SummonShadowsTimer = 53000; // Make it VERY close but slightly less so that we can check if the aura is still on the player
+                //SummonShadowsTimer = 53000ostano non spetta ; // Make it VERY close but slightly less so that we can check if the aura is still on the player
             }
-        }else ShadowOfDeathTimer -= diff;*/
+        }else ShadowOfDeathTimer -= diff;
 
         if(RandomYellTimer < diff)
         {
@@ -504,7 +532,14 @@ struct TRINITY_DLL_DECL boss_teron_gorefiendAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 };
-
+void teronshadowofdeathend(CreatureAI * ai,Player * p)
+{
+  
+  ((boss_teron_gorefiendAI*)ai)->GhostGUID = p->GetGUID();
+  ((boss_teron_gorefiendAI*)ai)->MindControlGhost();
+  
+  
+}
 CreatureAI* GetAI_mob_doom_blossom(Creature *_Creature)
 {
     return new mob_doom_blossomAI(_Creature);

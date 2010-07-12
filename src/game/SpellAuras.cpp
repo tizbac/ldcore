@@ -1042,12 +1042,25 @@ void Aura::_AddAura()
     }
 }
 
+void teronshadowofdeathend(CreatureAI * ai,Player * p);
+
 void Aura::_RemoveAura()
 {
     Unit* caster = GetCaster();
-    if ( caster && m_spellProto->Id == 22650 && caster->GetTypeId() == TYPEID_PLAYER )
+    Unit * caster2 = caster;
+    if ( caster || caster->GetTypeId() != TYPEID_PLAYER )
+      caster2 = GetTarget();
+    uint32 spellId = m_spellProto->Id;
+    if ( caster2 && spellId == 40251 && caster2->GetTypeId() == TYPEID_PLAYER && !caster2->HasAura(22650,0))
     {
-      Player * pl = (Player*)caster;
+      Player * pl = (Player*)caster2;
+      
+      
+      pl->CastSpell(pl,22650,true);
+    }
+    if ( caster2 && spellId == 22650 && caster2->GetTypeId() == TYPEID_PLAYER )
+    {
+      Player * pl = (Player*)caster2;
       Unit * ch = pl->GetCharm();
       if ( ch && ch->GetTypeId() == TYPEID_UNIT )
       {
@@ -1070,6 +1083,8 @@ void Aura::_RemoveAura()
       pl->RemoveAurasDueToSpell(8326);
       pl->RemoveAurasDueToSpell(42013);
     }
+    
+    
     if(caster && IsPersistent())
     {
         DynamicObject *dynObj = caster->GetDynObject(GetId(), GetEffIndex());
@@ -2116,9 +2131,17 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     pl = (Player*)m_target;
                   else
                     pl = (Player*)caster;
-                  Creature * c = pl->SummonCreature(60000,0.0,0.0,0.0,0.0,TEMPSUMMON_MANUAL_DESPAWN,6000000);
+                  //564,530.722473,422.617798,193.201523,5.3988
+                  
+                  
+   
+                  Creature * c = pl->SummonCreature(60000,0.0,0.0,0.0,5.3988,TEMPSUMMON_MANUAL_DESPAWN,6000000);
+                  
+                  
                   if ( !c )
                     return;
+                  if ( c->GetMapId() == 564 )
+                    c->Relocate(530.722473,422.617798,193.201523,5.3988);
                   c->SetName(pl->GetName());
                   c->SetMaxHealth(pl->GetMaxHealth());
                   c->SetHealth(pl->GetHealth());
@@ -2129,12 +2152,44 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                   c->SetSpeed(MOVE_RUN_BACK,pl->GetSpeed(MOVE_RUN_BACK));
                   c->setFaction(35);
                   c->SetLevel(pl->getLevel());
+                  
                   c->SetSpell(0,40314);//Aggiungi le spell 
                   c->SetSpell(1,40325);
                   c->SetSpell(2,40157);
                   c->SetSpell(3,40175);
                   c->SetSpell(4,40322);
                   pl->CastSpell(c,42013,true);//Casta il charm
+                  
+                  
+                  Creature * gorefiend = NULL;
+      
+      
+
+                  CellPair pair(Trinity::ComputeCellPair(pl->GetPositionX(), pl->GetPositionY()));
+                  Cell cell(pair);
+                  cell.data.Part.reserved = ALL_DISTRICT;
+                  cell.SetNoCreate();
+
+                  Trinity::NearestCreatureEntryWithLiveStateInObjectRangeCheck creature_check(*pl, 22871, true, 300.0f);
+                  Trinity::CreatureLastSearcher<Trinity::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(gorefiend, creature_check);
+
+                  TypeContainerVisitor<Trinity::CreatureLastSearcher<Trinity::NearestCreatureEntryWithLiveStateInObjectRangeCheck>, GridTypeMapContainer> creature_searcher(searcher);
+
+                  cell.Visit(pair, creature_searcher,*(pl->GetMap()));
+                  
+                  if ( !gorefiend )
+                  {
+                    sLog.outError("[SHADOW OF DEATH]Impossibile trovare gorefiend nel raggio di 300 yds");
+                    
+                  }else{
+                    if ( gorefiend->GetScriptName() == "boss_teron_gorefiend" )
+                    {
+                      teronshadowofdeathend(gorefiend->AI(),pl);
+                    }else{
+                      sLog.outError("[SHADOW OF DEATH]AI Non corretta di teron gorefiend");
+                    }
+                  }
+                  
                   //pl->SetVisibility(VISIBILITY_OFF);
                 }
               }
