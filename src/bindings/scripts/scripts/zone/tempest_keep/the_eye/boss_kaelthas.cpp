@@ -96,7 +96,9 @@ EndScriptData */
 
 //Thaladred the Darkener spells
 #define SPELL_PSYCHIC_BLOW                10689
+#define SPELL_TELEPORT					  20477
 #define SPELL_SILENCE                     30225
+#define SPELL_REND						  36965
 
 //Lord Sanguinar spells
 #define SPELL_BELLOWING_ROAR              40636
@@ -144,7 +146,7 @@ float KaelthasWeapons[7][5] =
 #define GRAVITY_Z 70.0f
 
 #define TIME_PHASE_2_3      120000
-#define TIME_PHASE_3_4      120000
+#define TIME_PHASE_3_4      180000
 
 #define KAEL_VISIBLE_RANGE  50.0f
 #define ROOM_BASE_Z 49.0f
@@ -202,7 +204,8 @@ struct TRINITY_DLL_DECL advisorbase_ai : public ScriptedAI
 
     void Revive(Unit* Target)
     {
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
         m_creature->SetHealth(m_creature->GetMaxHealth());
         m_creature->setFaction(m_creature->getFaction());
         m_creature->SetStandState(PLAYER_STATE_NONE);
@@ -281,12 +284,14 @@ struct TRINITY_DLL_DECL boss_kaelthasAI : public ScriptedAI
         AdvisorGuid[1] = 0;
         AdvisorGuid[2] = 0;
         AdvisorGuid[3] = 0;
+        
         SpellEntry *TempSpell = (SpellEntry*)GetSpellStore()->LookupEntry(SPELL_PYROBLAST);
         if(TempSpell)
         {
-            TempSpell->EffectImplicitTargetA[0] = 6;
-            TempSpell->EffectImplicitTargetB[0] = 0;
+        	TempSpell->EffectImplicitTargetA[0] = 6;
+        	TempSpell->EffectImplicitTargetB[0] = 0;
         }
+        
     }
 
     ScriptedInstance* pInstance;
@@ -888,14 +893,10 @@ struct TRINITY_DLL_DECL boss_kaelthasAI : public ScriptedAI
                     if (ChainPyros){
                         if (PyrosCasted < 3 && Check_Timer < diff)
                         {
-                            //Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 0);
-                            //DoCast(target, SPELL_PYROBLAST);
                             Unit* target = SelectUnit(SELECT_TARGET_TOPAGGRO, 0);
-                            if ( target )
-                              DoCast(target, SPELL_PYROBLAST);                   
+                            DoCast(target, SPELL_PYROBLAST);                   
                             ++PyrosCasted;
 
-                            
                             Check_Timer = 4400;
                         }else Check_Timer -= diff;
                         if(PyrosCasted > 3)
@@ -1057,12 +1058,16 @@ struct TRINITY_DLL_DECL boss_thaladred_the_darkenerAI : public advisorbase_ai
     uint32 Gaze_Timer;
     uint32 Silence_Timer;
     uint32 PsychicBlow_Timer;
+    uint32 Rend_Timer;
+    uint32 Teleport_Timer;
 
     void Reset()
     {
         Gaze_Timer = 100;
         Silence_Timer = 20000;
         PsychicBlow_Timer = 10000;
+        Rend_Timer = 15000;
+        Teleport_Timer = 5000;
 
         advisorbase_ai::Reset();
     }
@@ -1118,12 +1123,46 @@ struct TRINITY_DLL_DECL boss_thaladred_the_darkenerAI : public advisorbase_ai
             Silence_Timer = 20000;
         }else Silence_Timer -= diff;
 
+        //Rend_Timer
+        if(Rend_Timer < diff)
+        {
+            DoCast(m_creature->getVictim(), SPELL_REND);
+            Rend_Timer = 15000;
+        }else Rend_Timer -= diff;
+
         //PsychicBlow_Timer
         if(PsychicBlow_Timer < diff)
         {
             DoCast(m_creature->getVictim(), SPELL_PSYCHIC_BLOW);
             PsychicBlow_Timer = 20000+rand()%5000;
         }else PsychicBlow_Timer -= diff;
+
+        //Teleport_Timer
+		if(Teleport_Timer < diff)
+		{
+			bool InMeleeRange = false;
+			Unit *target = NULL;
+			std::list<HostilReference*>& m_threatlist = m_creature->getThreatManager().getThreatList();
+			for (std::list<HostilReference*>::iterator i = m_threatlist.begin(); i!= m_threatlist.end();++i)
+			{
+				Unit* pUnit = Unit::GetUnit((*m_creature), (*i)->getUnitGuid());
+															//if in melee range
+				if(pUnit && pUnit->IsWithinDistInMap(m_creature, 5))
+				{
+					InMeleeRange = true;
+					break;
+				}
+			}
+
+			if(!InMeleeRange)
+			{
+				DoResetThreat();
+				target = SelectUnit(SELECT_TARGET_RANDOM, 0, 100, true);
+				DoCast(target, SPELL_TELEPORT);
+			}
+
+			Teleport_Timer = 4000+rand()%2000;
+		}else Teleport_Timer -= diff;
 
         DoMeleeAttackIfReady();
     }
@@ -1163,7 +1202,7 @@ struct TRINITY_DLL_DECL boss_lord_sanguinarAI : public advisorbase_ai
         advisorbase_ai::UpdateAI(diff);
 
         //Faking death, don't do anything
-        if (FakeDeath)
+        if (FakeDeath)DoResetThreat();
             return;
 
         //Return since we have no target
@@ -1173,7 +1212,7 @@ struct TRINITY_DLL_DECL boss_lord_sanguinarAI : public advisorbase_ai
         //Fear_Timer
         if(Fear_Timer < diff)
         {
-            DoCast(m_creature->getVictim(), SPELL_BELLOWING_ROAR);
+            DoCast(m_creature, SPELL_BELLOWING_ROAR);
             Fear_Timer = 25000+rand()%10000;                //approximately every 30 seconds
         }else Fear_Timer -= diff;
 
@@ -1184,7 +1223,20 @@ struct TRINITY_DLL_DECL boss_lord_sanguinarAI : public advisorbase_ai
 //Grand Astromancer Capernian AI
 struct TRINITY_DLL_DECL boss_grand_astromancer_capernianAI : public advisorbase_ai
 {
-    boss_grand_astromancer_capernianAI(Creature *c) : advisorbase_ai(c){}
+    boss_grand_astromancer_capernianAI(Creature *c) : advisorbase_ai(c)
+    {
+        SpellEntry *TempSpell = (SpellEntry*)GetSpellStore()->LookupEntry(SPELL_CONFLAGRATION);
+        if(TempSpell)
+        {
+        	TempSpell->EffectImplicitTargetA[0] = 6;
+        	TempSpell->EffectImplicitTargetB[0] = 0;
+        	TempSpell->EffectImplicitTargetA[1] = 6;
+		TempSpell->EffectImplicitTargetB[1] = 0;
+		TempSpell->EffectImplicitTargetA[2] = 6;
+		TempSpell->EffectImplicitTargetB[2] = 0;
+        }
+
+    }
 
     uint32 Fireball_Timer;
     uint32 Conflagration_Timer;
@@ -1312,6 +1364,20 @@ struct TRINITY_DLL_DECL boss_master_engineer_telonicusAI : public advisorbase_ai
     uint32 Bomb_Timer;
     uint32 RemoteToy_Timer;
 
+    void RemoveRemoteToy()
+        {
+            InstanceMap::PlayerList const &playerliste = ((InstanceMap*)m_creature->GetMap())->GetPlayers();
+            InstanceMap::PlayerList::const_iterator it;
+
+            Map::PlayerList const &PlayerList = ((InstanceMap*)m_creature->GetMap())->GetPlayers();
+            for(Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+            {
+                Player* i_pl = i->getSource();
+                if(i_pl)
+                	i_pl->RemoveAurasDueToSpell(SPELL_REMOTE_TOY);
+            }
+        }
+
     void Reset()
     {
         Bomb_Timer = 10000;
@@ -1342,7 +1408,11 @@ struct TRINITY_DLL_DECL boss_master_engineer_telonicusAI : public advisorbase_ai
 
         //Faking Death, do nothing
         if (FakeDeath)
-            return;
+        {
+        	RemoveRemoteToy();
+        	return;
+        }
+
 
         //Return since we have no target
         if (!UpdateVictim() )
@@ -1624,4 +1694,5 @@ void AddSC_boss_kaelthas()
     newscript->GetAI = &GetAI_mob_phoenix_egg_tk;
     newscript->RegisterSelf();
 }
+
 

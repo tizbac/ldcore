@@ -4267,6 +4267,19 @@ void Spell::SpellDamageWeaponDmg(uint32 i)
 
     switch(m_spellInfo->SpellFamilyName)
     {
+	  case SPELLFAMILY_GENERIC:
+	  {
+		//Telonicus Bomb
+		if(m_spellInfo->Id == 37036)
+		{
+			uint32 damage = CalculateDamage(0, unitTarget);
+			m_caster->MeleeDamageBonus(unitTarget, &damage, m_attackType, m_spellInfo);
+			m_damage += damage;
+
+			return;
+		}
+		break;
+	  }    	  
         case SPELLFAMILY_WARRIOR:
         {
             // Devastate bonus and sunder armor refresh
