@@ -8537,6 +8537,28 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
             if(bonusHeal)
                 finalHeal *= (100.0f + bonusHeal) / 100.0f;
         }
+        
+        if(pVictim->GetTypeId()==TYPEID_PLAYER && pVictim->getClass()==CLASS_ROGUE && checkSpecialBonus)
+        {
+            bonusHeal = 0;
+
+            AuraMap const& uAuras = pVictim->GetAuras();
+            for (AuraMap::const_iterator itr = uAuras.begin(); itr != uAuras.end(); ++itr)
+            {
+                switch(itr->second->GetId())
+                {
+                    //Quick Recovery
+                    case 31244:
+                        bonusHeal = 10;
+                        break;
+                    case 31245:
+                        bonusHeal = 20;
+                        break;
+                }
+            }
+            if(bonusHeal)
+                finalHeal *= (100.0f + bonusHeal) / 100.0f;
+        }
 
         return uint32(finalHeal);
     }
