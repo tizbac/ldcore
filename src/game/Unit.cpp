@@ -4245,7 +4245,6 @@ bool Unit::RemoveNoStackAurasDueToAura(Aura *Aur)
 
 void Unit::RemoveAura(uint32 spellId, uint32 effindex, Aura* except)
 {
-    
     spellEffectPair spair = spellEffectPair(spellId, effindex);
     for(AuraMap::iterator iter = m_Auras.lower_bound(spair); iter != m_Auras.upper_bound(spair);)
     {
