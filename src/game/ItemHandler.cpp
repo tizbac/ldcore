@@ -675,10 +675,11 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
             _player->RemoveItemFromBuyBackSlot( slot, false );
             _player->ItemAddedQuestCheck( pItem->GetEntry(), pItem->GetCount());
             _player->StoreItem( dest, pItem, true );
-             if ( pItem->GetProto() && _player->GetSession() && pItem->GetProto()->Quality > 3)
+            ItemPrototype * proto = objmgr.GetItemPrototype(pItem->GetEntry());
+             if ( proto && _player->GetSession() && proto->Quality > 3)
             {
               sLog.outItem("Player '%s' GUID: %llu , IP: '%s' -> BUYBACK [%s] : Entry = %u , ItemInstance: %llu , Count: %u, Quality: %u",_player->GetName(),_player->GetGUID(),_player->GetSession()->GetRemoteAddress().c_str(),
-                          pItem->GetProto()->Name1,pItem->GetEntry(),pItem->GetGUID(),pItem->GetCount(),pItem->GetProto()->Quality);
+                          proto->Name1,pItem->GetEntry(),pItem->GetGUID(),pItem->GetCount(),proto->Quality);
               sLog.outItem("\tItemInstance %llu  Charges = %u , Soulbound: %s",pItem->GetGUID(),pItem->GetSpellCharges(),pItem->IsSoulBound() ? "True" : "False" );
             }
         }
