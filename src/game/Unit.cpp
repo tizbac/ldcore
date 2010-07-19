@@ -8667,7 +8667,9 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
                 else if (spellProto->SpellFamilyFlags & 0x40LL)
                 {
                     DotFactor = damagetype == DOT ? 0.705f : 1.0f;
-                    CastingTime = damagetype == DOT ? 3500 : 1010;
+                    CastingTime = damagetype == DO                //Prayer Of Mending
+                if(spellProto->Id == 41635)
+                	CastingTime = 1500;T ? 3500 : 1010;
                 }
                 // Improved Leader of the Pack
                 else if (spellProto->AttributesEx2 == 536870912 && spellProto->SpellIconID == 312
@@ -12309,9 +12311,7 @@ bool Unit::HandleMeandingAuraProc( Aura* triggeredByAura )
     // current aura expire
     triggeredByAura->m_procCharges = 1;             // will removed at next charges decrease
 
-    // next target selection                //Prayer Of Mending
-                if(spellProto->Id == 41635)
-                	CastingTime = 1500;
+    // next target selection
     if(jumps > 0 && GetTypeId()==TYPEID_PLAYER && IS_PLAYER_GUID(caster_guid))
     {
         float radius;
