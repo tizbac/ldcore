@@ -8667,9 +8667,7 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
                 else if (spellProto->SpellFamilyFlags & 0x40LL)
                 {
                     DotFactor = damagetype == DOT ? 0.705f : 1.0f;
-                    CastingTime = damagetype == DO                //Prayer Of Mending
-                if(spellProto->Id == 41635)
-                	CastingTime = 1500;T ? 3500 : 1010;
+                    CastingTime = damagetype == DOT ? 3500 : 1010;
                 }
                 // Improved Leader of the Pack
                 else if (spellProto->AttributesEx2 == 536870912 && spellProto->SpellIconID == 312
@@ -8684,7 +8682,7 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
                     CastingTime = 500;
                 //Prayer Of Mending
                 if(spellProto->Id == 41635)
-                	CastingTime = 1500;
+                	  CastingTime = 1500;
                 break;
             case SPELLFAMILY_PALADIN:
                 // Seal and Judgement of Light
