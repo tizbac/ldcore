@@ -8680,6 +8680,9 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
                 // Holy Nova - 14%
                 if ((spellProto->SpellFamilyFlags & 0x8000000LL) && spellProto->SpellIconID == 1874)
                     CastingTime = 500;
+                //Prayer Of Mending
+                if(spellProto->Id == 41635)
+                	CastingTime = 1500;
                 break;
             case SPELLFAMILY_PALADIN:
                 // Seal and Judgement of Light
@@ -12306,7 +12309,9 @@ bool Unit::HandleMeandingAuraProc( Aura* triggeredByAura )
     // current aura expire
     triggeredByAura->m_procCharges = 1;             // will removed at next charges decrease
 
-    // next target selection
+    // next target selection                //Prayer Of Mending
+                if(spellProto->Id == 41635)
+                	CastingTime = 1500;
     if(jumps > 0 && GetTypeId()==TYPEID_PLAYER && IS_PLAYER_GUID(caster_guid))
     {
         float radius;
