@@ -12338,6 +12338,8 @@ bool Unit::HandleMeandingAuraProc( Aura* triggeredByAura )
 
                 heal = caster->SpellHealingBonus(spellProto, heal, HEAL, this);
             }
+            else
+                heal = caster->SpellHealingBonus(spellProto, heal, HEAL, this);
         }
     }
 
