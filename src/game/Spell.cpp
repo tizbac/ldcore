@@ -1018,7 +1018,12 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     // Do healing and triggers
     if (m_healing > 0)
     {
-        bool crit = caster->isSpellCrit(NULL, m_spellInfo, m_spellSchoolMask);
+        bool crit = false;
+    	  //Lifebloom and Earth Shield should take the crit chance of who it is cast on
+    	  if(m_spellInfo->Id != 33778 && m_spellInfo->Id != 379)
+    		crit = caster->isSpellCrit(NULL, m_spellInfo, m_spellSchoolMask);
+    	  else
+    		crit = unit->isSpellCrit(NULL, m_spellInfo, m_spellSchoolMask);
         uint32 addhealth = m_healing;
         if (crit)
         {
