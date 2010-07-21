@@ -6740,7 +6740,25 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
          {
              if (triggerAmount == 0)
                  return false;
-             basepoints0 = triggerAmount * GetMaxHealth() / 100;
+             
+                float bonusHeal = 1.0f;
+
+                AuraMap const& uAuras = GetAuras();
+                for (AuraMap::const_iterator itr = uAuras.begin(); itr != uAuras.end(); ++itr)
+                {
+                	  switch(itr->second->GetId())
+                	  {
+                		//Nurturing Intincts
+                		case 33872:
+                		    bonusHeal += 0.1;
+                		    break;
+                		case 33873:
+                		    bonusHeal += 0.2;
+                		    break;
+                 	  }
+          	    }
+             basepoints0 = triggerAmount * GetMaxHealth() / 100 * bonusHeal;
+
              trigger_spell_id = 34299;
          }
          break;
@@ -8362,7 +8380,7 @@ bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
     {
         case SPELL_DAMAGE_CLASS_NONE:
         	if(spellProto->Id != 33778 && spellProto->Id != 379)
-                return false;
+		    return false;
         case SPELL_DAMAGE_CLASS_MAGIC:
         {
             if (schoolMask & SPELL_SCHOOL_MASK_NORMAL)
