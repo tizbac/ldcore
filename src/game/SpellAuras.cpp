@@ -4014,7 +4014,18 @@ void Aura::HandleAuraModDispelImmunity(bool apply, bool Real)
 void Aura::HandleAuraProcTriggerSpell(bool apply, bool Real)
 {
     if(!Real)
-        return;
+    {
+    	  switch(m_spellProto->Id)
+    	  {
+		//Entrapment
+		case 19184:
+		case 19387:
+		case 19388:
+		    break;
+		default:
+	          return;
+    	   }
+    }
 
     if(apply)
     {
