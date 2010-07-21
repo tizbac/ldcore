@@ -1627,22 +1627,32 @@ bool GossipHello_npc_akama_at_illidan(Player *player, Creature *_Creature)
 
 struct TRINITY_DLL_DECL cage_trap_triggerAI : public ScriptedAI
 {
-    cage_trap_triggerAI(Creature *c) : ScriptedAI(c) {}
+    cage_trap_triggerAI(Creature *c) : ScriptedAI(c)
+    {
+    	pInstance = ((ScriptedInstance*)c->GetInstanceData());
+    	IllidanGUID = pInstance->GetData64(DATA_ILLIDANSTORMRAGE);
+    	Illidan = (Unit::GetCreature((*m_creature), IllidanGUID));
+    }
 
-    uint64 IllidanGUID;
+    ScriptedInstance *pInstance;
+
+	uint64 IllidanGUID;
+	Creature* Illidan;
+
     uint32 DespawnTimer;
 
+    bool TrapTimer;
     bool Active;
     bool SummonedBeams;
 
     void Reset()
     {
-        IllidanGUID = 0;
 
         Active = false;
         SummonedBeams = false;
 
-        DespawnTimer = 0;
+        TrapTimer = 2000;
+        DespawnTimer = 5000;
 
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
@@ -1651,34 +1661,31 @@ struct TRINITY_DLL_DECL cage_trap_triggerAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit *who)
     {
-        if(!Active)
-            return;
 
-        if(who && (who->GetTypeId() != TYPEID_PLAYER))
-        {
-            if(who->GetEntry() == ILLIDAN_STORMRAGE) // Check if who is Illidan
-            {
-                if(!IllidanGUID && m_creature->IsWithinDistInMap(who, 3) && (!who->HasAura(SPELL_CAGED, 0)))
-                {
-                    IllidanGUID = who->GetGUID();
-                    who->CastSpell(who, SPELL_CAGED, true);
-                    DespawnTimer = 5000;
-                    if(who->HasAura(SPELL_ENRAGE, 0))
-                        who->RemoveAurasDueToSpell(SPELL_ENRAGE); // Dispel his enrage
-                    //if(GameObject* CageTrap = GameObject::GetGameObject(*m_creature, CageTrapGUID))
-                    //    CageTrap->SetLootState(GO_JUST_DEACTIVATED);
-                }
-            }
-        }
     }
 
     void UpdateAI(const uint32 diff)
     {
-        if(DespawnTimer)
-            if(DespawnTimer < diff)
-                m_creature->Kill(m_creature);
-            else DespawnTimer -= diff;
+		if(DespawnTimer < diff)
+			m_creature->Kill(m_creature);
+		else DespawnTimer -= diff;
 
+        if(TrapTimer < diff)
+        {
+			if(Active)
+			{
+                if(Illidan)
+                {
+                        if(m_creature->IsWithinDistInMap(Illidan, 8) && (!Illidan->HasAura(SPELL_CAGED, 0)))
+                        {
+                            Illidan->CastSpell(Illidan, SPELL_CAGED, true);
+                            if(Illidan->HasAura(SPELL_ENRAGE, 0))
+                                Illidan->RemoveAurasDueToSpell(SPELL_ENRAGE); // Dispel his enrage
+                        }
+                }
+			}
+        }
+        else TrapTimer -= diff;
             //if(IllidanGUID && !SummonedBeams)
             //{
             //    if(Unit* Illidan = Unit::GetUnit(*m_creature, IllidanGUID)
@@ -2259,4 +2266,5 @@ void AddSC_boss_illidan()
     newscript->GetAI = &GetAI_parasitic_shadowfiend;
     newscript->RegisterSelf();
 }
+
 
