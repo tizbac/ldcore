@@ -675,7 +675,7 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
             _player->RemoveItemFromBuyBackSlot( slot, false );
             _player->ItemAddedQuestCheck( pItem->GetEntry(), pItem->GetCount());
             _player->StoreItem( dest, pItem, true );
-            ItemPrototype * proto = objmgr.GetItemPrototype(pItem->GetEntry());
+            const ItemPrototype * proto = objmgr.GetItemPrototype(pItem->GetEntry());
              if ( proto && _player->GetSession() && proto->Quality > 3)
             {
               sLog.outItem("Player '%s' GUID: %llu , IP: '%s' -> BUYBACK [%s] : Entry = %u , ItemInstance: %llu , Count: %u, Quality: %u",_player->GetName(),_player->GetGUID(),_player->GetSession()->GetRemoteAddress().c_str(),
