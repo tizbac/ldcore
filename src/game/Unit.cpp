@@ -11452,6 +11452,21 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                     break;
             }
         }
+        
+        else
+        {
+        	switch(itr->second->GetSpellProto()->SpellFamilyName)
+        	{
+			case SPELLFAMILY_MAGE:
+				if(itr->second->GetSpellProto()->SpellFamilyFlags & 0x020C0000LL && (procExtra & PROC_EX_ABSORB) && isVictim && !damage)
+				{
+					//Molten Armor and Ice Armor proc
+					skip = false;
+				}
+        	}
+
+        }
+
 
         if(skip)
             continue;

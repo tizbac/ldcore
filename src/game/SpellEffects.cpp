@@ -5147,7 +5147,7 @@ void Spell::EffectScriptEffect(uint32 effIndex)
         // Needle Spine
         //case 39835: unitTarget->CastSpell(unitTarget, 39968, true); break;
         // Draw Soul
-        case 40904: unitTarget->CastSpell(m_caster, 40903, true); break;
+        case 40904: m_caster->CastSpell(m_caster, 40903, true); break;
         // Flame Crash
         //case 41126: unitTarget->CastSpell(unitTarget, 41131, true); break;
         case 41931:
@@ -5196,7 +5196,7 @@ void Spell::EffectScriptEffect(uint32 effIndex)
             if(unitTarget->HasAura(46394, 0)) // spell of Brutallus - Burn
                 unitTarget->RemoveAurasDueToSpell(46394);
             break;
-        }
+        }m_caster
         // Negative Energy
         case 46289: m_caster->CastSpell(unitTarget, 46285, true); break;
         //5,000 Gold
