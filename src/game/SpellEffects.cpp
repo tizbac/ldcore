@@ -5196,7 +5196,7 @@ void Spell::EffectScriptEffect(uint32 effIndex)
             if(unitTarget->HasAura(46394, 0)) // spell of Brutallus - Burn
                 unitTarget->RemoveAurasDueToSpell(46394);
             break;
-        }m_caster
+        }
         // Negative Energy
         case 46289: m_caster->CastSpell(unitTarget, 46285, true); break;
         //5,000 Gold
