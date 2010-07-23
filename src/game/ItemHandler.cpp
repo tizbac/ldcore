@@ -671,17 +671,18 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
         uint8 msg = _player->CanStoreItem( NULL_BAG, NULL_SLOT, dest, pItem, false );
         if( msg == EQUIP_ERR_OK )
         {
-            _player->ModifyMoney( -(int32)price );
-            _player->RemoveItemFromBuyBackSlot( slot, false );
-            _player->ItemAddedQuestCheck( pItem->GetEntry(), pItem->GetCount());
-            _player->StoreItem( dest, pItem, true );
             const ItemPrototype * proto = objmgr.GetItemPrototype(pItem->GetEntry());
-             if ( proto && _player->GetSession() && proto->Quality > 3)
+            if ( proto && _player->GetSession() && proto->Quality > 3)
             {
               sLog.outItem("Player '%s' GUID: %llu , IP: '%s' -> BUYBACK [%s] : Entry = %u , ItemInstance: %llu , Count: %u, Quality: %u",_player->GetName(),_player->GetGUID(),_player->GetSession()->GetRemoteAddress().c_str(),
                           proto->Name1,pItem->GetEntry(),pItem->GetGUID(),pItem->GetCount(),proto->Quality);
               sLog.outItem("\tItemInstance %llu  Charges = %u , Soulbound: %s",pItem->GetGUID(),pItem->GetSpellCharges(),pItem->IsSoulBound() ? "True" : "False" );
             }
+            _player->ModifyMoney( -(int32)price );
+            _player->RemoveItemFromBuyBackSlot( slot, false );
+            _player->ItemAddedQuestCheck( pItem->GetEntry(), pItem->GetCount());
+            _player->StoreItem( dest, pItem, true );
+            
         }
         else
             _player->SendEquipError( msg, pItem, NULL );
