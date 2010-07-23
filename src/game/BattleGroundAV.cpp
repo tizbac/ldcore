@@ -992,7 +992,11 @@ void BattleGroundAV::EventPlayerAssaultsPoint(Player* player, uint32 object)
     {
         if(object == BG_AV_OBJECT_FLAG_N_SNOWFALL_GRAVE) //initial capping
         {
-            assert(owner == AV_NEUTRAL_TEAM && m_Nodes[node].TotalOwner == AV_NEUTRAL_TEAM);
+            if ( not ( owner == AV_NEUTRAL_TEAM && m_Nodes[node].TotalOwner == AV_NEUTRAL_TEAM ) )
+            {
+              sLog.outError("Alterac Valley: asserzione owner == AV_NEUTRAL_TEAM && m_Nodes[node].TotalOwner == AV_NEUTRAL_TEAM fallita");
+              return;
+            }
             if( team == ALLIANCE )
                 SpawnBGObject(BG_AV_OBJECT_FLAG_C_A_SNOWFALL_GRAVE, RESPAWN_IMMEDIATELY);
             else
@@ -1001,7 +1005,11 @@ void BattleGroundAV::EventPlayerAssaultsPoint(Player* player, uint32 object)
         }
         else if(m_Nodes[node].TotalOwner == AV_NEUTRAL_TEAM) //recapping, when no team owns this node realy
         {
-            assert(m_Nodes[node].State != POINT_CONTROLED);
+            if ( not ( m_Nodes[node].State != POINT_CONTROLED) )
+            {
+              sLog.outError("Alterac Valley: asserzione m_Nodes[node].State != POINT_CONTROLED fallita");
+              return;
+            }
             if(team == ALLIANCE)
                 SpawnBGObject(object-11, RESPAWN_IMMEDIATELY);
             else
@@ -1029,7 +1037,12 @@ void BattleGroundAV::EventPlayerAssaultsPoint(Player* player, uint32 object)
     //if snowfall gots capped it can be handled like all other graveyards
     if( m_Nodes[node].TotalOwner != AV_NEUTRAL_TEAM)
     {
-        assert(m_Nodes[node].Owner != AV_NEUTRAL_TEAM);
+        if ( not ( m_Nodes[node].Owner != AV_NEUTRAL_TEAM) )
+        {
+          sLog.outError("Alterac Valley: Asserzione m_Nodes[node].Owner != AV_NEUTRAL_TEAM fallita.");
+          return;
+          
+        }
         if(team == ALLIANCE)
             SpawnBGObject(object-22, RESPAWN_IMMEDIATELY);
         else
