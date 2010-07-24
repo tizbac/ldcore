@@ -4000,6 +4000,15 @@ bool Unit::AddAura(Aura *Aur)
                 case SPELL_AURA_OBS_MOD_HEALTH:
                     ++i2;
                     continue;
+                //Lifebloom Aura Dummy stack...
+                case SPELL_AURA_DUMMY:
+                {
+                	  if (aurSpellInfo->SpellFamilyFlags & 0x1000000000LL && aurSpellInfo->SpellFamilyName == SPELLFAMILY_DRUID)
+                	  {
+                		++i2;
+                		continue;
+                	  }
+                }
             }
             RemoveAura(i2,AURA_REMOVE_BY_STACK);
             i2=m_Auras.lower_bound(spair);
