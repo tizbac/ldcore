@@ -48,10 +48,42 @@
 const char MAP_MAGIC[] = "MAP_2.50";
 
 GridState* si_GridStates[MAX_GRID_STATE];
-
+void * updatethreadfunc(void * mapptr)
+{
+  Map* map = (Map*)mapptr;
+  while ( true )
+  {
+  //sLog.outDebug("%d: Update Map Thread starting map %d",getTime(),((Map*)mapptr)->GetId());
+    
+    
+    map->updatemutex2->Lock();
+    //printf("MAP %d: Waiting update...\n",map->GetId());
+    map->updatecond2->Wait(map->updatemutex2);// Sincronizza con l'update originale del world
+    
+    map->updatemutex2->UnLock();
+    
+    //printf("MAP %d: Updating...\n",map->GetId());
+    map->Update_REAL(map->currdiff);
+    //printf("MAP %d: Done.\n",map->GetId());
+    
+    map->updatemutex3->UnLock();//Sincronizza il thread originale di trinity al termine di questo
+  }
+  //sLog.outDebug("%d: Update Map Thread end map %d",getTime(),((Map*)mapptr)->GetId());
+}
 Map::~Map()
 {
+   
     UnloadAll();
+    
+    
+    updatethread->Kill();
+    delete updatethread;
+    delete updatecond2;
+    delete updatemutex;
+    delete updatecond;
+    delete updatemutex2;
+    delete updatemutex3;
+    
 }
 
 bool Map::ExistMap(uint32 mapid,int x,int y)
@@ -222,6 +254,14 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode)
             setNGrid(NULL, idx, j);
         }
     }
+    updatecond = new Condition();
+    updatemutex = new XMutex();
+    updatecond2 = new Condition();
+    updatemutex3 = new XMutex();
+    updatemutex2 = new XMutex();
+    updatethread = new XThread(updatethreadfunc,this);
+    
+    currentupdatingcreature = 0;
 }
 
 // Template specialization of utility methods
@@ -684,6 +724,38 @@ void Map::AddUnitToNotify(Unit* u)
 }
 
 void Map::Update(const uint32 &t_diff)
+{
+  currdiff = t_diff;
+  updatemutex3->Lock();
+  updatecond2->Broadcast();//Avvia l'update
+  //sLog.outDebug("Map::Update mapid=%d, Waiting 5 seconds",GetId());
+  
+  int res = updatemutex3->TimedLock(15);//Aspetta l'update per massimo 15 secondi TODO: Deve essere configurabile
+  //sLog.outDebug("Map::Update mapid=%d, Done exit code: %d",GetId(),res);
+  if ( res == ETIMEDOUT )
+  {
+    sLog.outError("Freeze all'update della mappa '%s'  ( %d , Instance: %d)",GetMapName(),GetId(),GetInstanceId());
+    updatethread->Kill();//Killa il thread di update
+    delete updatethread;
+    
+    if ( currentupdatingcreature )
+    {
+      Creature * causedby = currentupdatingcreature;
+      sLog.outError("Freeze causato da '%s' ( GUID: %llu ) , despawn forzato!",causedby->GetName(),causedby->GetGUID());
+      causedby->Yell("|c0000ffffFreeze durante l'update di questo npc, despawn forzato!|r , l'npc dovrà essere respawnato da un GM nel caso sia necessario",0,0);
+      causedby->ForcedDespawn();
+      causedby->SetRespawnTime(0xFFFFFFFF);
+    }else{
+      sLog.outError("Causa sconosciuta, errore non gestito, crash imminente!");
+    }
+    updatemutex2->UnLock();
+    updatemutex3->UnLock();
+    updatethread = new XThread(updatethreadfunc,this);//Respawna il thread
+  }else{
+  updatemutex3->UnLock();
+  }
+}
+void Map::Update_REAL(const uint32 &t_diff)
 {
     i_lock = false;
 
@@ -1823,6 +1895,7 @@ InstanceMap::~InstanceMap()
         delete i_data;
         i_data = NULL;
     }
+    
 }
 
 /*

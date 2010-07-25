@@ -20,6 +20,8 @@ SET(shared_STAT_SRCS
    ProgressBar.h
    Timer.h
    Util.cpp
+   XThread.cpp
+   XThread.h
    Util.h
    WorldPacket.h
    SystemConfig.h

@@ -30,6 +30,7 @@
 #include "GridDefines.h"
 #include "Cell.h"
 #include "Timer.h"
+#include "XThread.h"
 #include "SharedDefines.h"
 #include "GameSystem/GridRefManager.h"
 #include "MapRefManager.h"
@@ -116,7 +117,12 @@ class TRINITY_DLL_SPEC Map : public GridRefManager<NGridType>, public Trinity::O
     public:
         Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode);
         virtual ~Map();
-
+        Condition * updatecond;
+        Condition * updatecond2;
+        XMutex * updatemutex2;
+        XMutex * updatemutex;
+        XMutex * updatemutex3;
+        XThread * updatethread;
         // currently unused for normal maps
         bool CanUnload(uint32 diff)
         {
@@ -125,14 +131,15 @@ class TRINITY_DLL_SPEC Map : public GridRefManager<NGridType>, public Trinity::O
             m_unloadTimer -= diff;
             return false;
         }
-
+        Creature * currentupdatingcreature;
+        void Update_REAL(const uint32&);
         virtual bool Add(Player *);
         virtual void Remove(Player *, bool);
         template<class T> void Add(T *);
         template<class T> void Remove(T *, bool);
 
         virtual void Update(const uint32&);
-
+        unsigned int currdiff;
         void MessageBroadcast(Player *, WorldPacket *, bool to_self, bool to_possessor);
         void MessageBroadcast(WorldObject *, WorldPacket *, bool to_possessor);
         void MessageDistBroadcast(Player *, WorldPacket *, float dist, bool to_self, bool to_possessor, bool own_team_only = false);
@@ -410,6 +417,7 @@ class TRINITY_DLL_SPEC InstanceMap : public Map
         ~InstanceMap();
         bool Add(Player *);
         void Remove(Player *, bool);
+        
         void Update(const uint32&);
         void CreateInstanceData(bool load);
         bool Reset(uint8 method);

@@ -424,6 +424,7 @@ bool Creature::UpdateEntry(uint32 Entry, uint32 team, const CreatureData *data )
 
 void Creature::Update(uint32 diff)
 {
+    GetMap()->currentupdatingcreature = this;
     if(m_GlobalCooldown <= diff)
         m_GlobalCooldown = 0;
     else
@@ -565,6 +566,7 @@ void Creature::Update(uint32 diff)
         default:
             break;
     }
+    GetMap()->currentupdatingcreature = NULL;
 }
 
 void Creature::RegenerateMana()
