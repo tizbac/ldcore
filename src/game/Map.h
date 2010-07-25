@@ -123,6 +123,7 @@ class TRINITY_DLL_SPEC Map : public GridRefManager<NGridType>, public Trinity::O
         XMutex * updatemutex;
         XMutex * updatemutex3;
         XThread * updatethread;
+        bool deleting;
         // currently unused for normal maps
         bool CanUnload(uint32 diff)
         {

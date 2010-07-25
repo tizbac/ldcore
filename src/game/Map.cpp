@@ -61,7 +61,8 @@ void * updatethreadfunc(void * mapptr)
     map->updatecond2->Wait(map->updatemutex2);// Sincronizza con l'update originale del world
     
     map->updatemutex2->UnLock();
-    
+    if ( map->deleting )
+      return NULL;
     //printf("MAP %d: Updating...\n",map->GetId());
     map->Update_REAL(map->currdiff);
     //printf("MAP %d: Done.\n",map->GetId());
@@ -75,8 +76,10 @@ Map::~Map()
    
     UnloadAll();
     
-    
-    updatethread->Kill();
+    deleting = true;
+    updatemutex3->Lock();
+    updatecond2->Broadcast();
+    updatethread->Join();
     delete updatethread;
     delete updatecond2;
     delete updatemutex;
@@ -260,7 +263,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode)
     updatemutex3 = new XMutex();
     updatemutex2 = new XMutex();
     updatethread = new XThread(updatethreadfunc,this);
-    
+    deleting = false;
     currentupdatingcreature = 0;
 }
 
