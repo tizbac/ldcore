@@ -1810,7 +1810,10 @@ void World::ScriptsProcess()
         }
 
         //if(target && !target->IsInWorld()) target = NULL;
-
+        if ( ! step.script )
+        {
+          continue;
+        }
         switch (step.script->command)
         {
             case SCRIPT_COMMAND_TALK:
