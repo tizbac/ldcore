@@ -1,13 +1,8 @@
 #ifndef THREAD_H
 #define THREAD_H
 #include <pthread.h>
-#include <iostream>
-#include <map>
-//#include <Log.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <sys/times.h>
-using namespace std;
+
+
 class XThread{
   public:
   pthread_t tid;

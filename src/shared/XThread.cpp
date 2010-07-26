@@ -8,7 +8,7 @@ XThread::XThread(void *(*f)(void *),void * arg)
   if ( err != 0)
   {
     //sLog.outError("FATAL: Thread failed to spawn");
-    abort();
+    //abort();
   }
   
 }
