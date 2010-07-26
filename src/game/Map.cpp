@@ -747,7 +747,11 @@ void Map::Update(const uint32 &t_diff)
       sLog.outError("Freeze causato da '%s' ( GUID: %llu ) , despawn forzato!",causedby->GetName(),causedby->GetGUID());
       causedby->Yell("|c0000ffffFreeze durante l'update di questo npc, despawn forzato!|r , l'npc dovrà essere respawnato da un GM nel caso sia necessario",0,0);
       causedby->ForcedDespawn();
-      causedby->SetRespawnTime(0xFFFFFFFF);
+     // causedby->CombatStop();
+      //causedby->CleanupsBeforeDelete();
+      causedby->AddObjectToRemoveList();
+      currentupdatingcreature = NULL;
+      //causedby->SetRespawnTime(0xFFFFFFFF);
     }else{
       sLog.outError("Causa sconosciuta, errore non gestito, crash imminente!");
     }
