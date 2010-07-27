@@ -101,6 +101,18 @@ void SCallBack(int s)
       raise(SIGKILL);
     else
       Trinity::Singleton<World>::Instance().StopNow(2);
+  }else if ( s == SIGALRM )
+  {
+    void *array[100];
+    size_t size;
+    size = backtrace(array, 100);
+    char ** bt = backtrace_symbols(array, size);
+    sLog.outError("Backtrace del freeze:");
+    for ( int i = 0; i < size;i++)
+    {
+      sLog.outError("\t#%d : %s\n",i,bt[i]);
+    }
+    pthread_exit(NULL);
   }
   
 }
@@ -134,7 +146,7 @@ extern int main(int argc, char **argv)
     signal(SIGSEGV,SCallBack);
     signal(SIGABRT,SCallBack);
     signal(SIGFPE,SCallBack);
-    
+    signal(SIGALRM,SCallBack);
     while( c < argc )
     {
         if( strcmp(argv[c],"-c") == 0)

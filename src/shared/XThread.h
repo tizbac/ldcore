@@ -1,7 +1,7 @@
 #ifndef THREAD_H
 #define THREAD_H
 #include <pthread.h>
-
+#include <signal.h>
 
 class XThread{
   public:
@@ -9,6 +9,7 @@ class XThread{
   
   XThread(void *(*f)(void *),void * arg);
   void Kill();
+  void SendSignal(int signal);
   ~XThread();
   void Join();
 };

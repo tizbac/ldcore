@@ -24,6 +24,10 @@ XThread::~XThread()
 {
 
 }
+void XThread::SendSignal(int signal)
+{
+  pthread_kill(tid,signal);
+}
 
 XMutex::XMutex()
 {

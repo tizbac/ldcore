@@ -738,9 +738,11 @@ void Map::Update(const uint32 &t_diff)
   if ( res == ETIMEDOUT )
   {
     sLog.outError("Freeze all'update della mappa '%s'  ( %d , Instance: %d)",GetMapName(),GetId(),GetInstanceId());
-    updatethread->Kill();//Killa il thread di update
-    delete updatethread;
+    updatethread->SendSignal(SIGALRM);
     
+    sleep(1);//Aspetta 1 secondo per assicurarsi che la stacktrace sia stata scritta
+    updatethread->Kill();//Killa per sicurezza se non si è già killato da solo
+    delete updatethread;
     if ( currentupdatingcreature )
     {
       Creature * causedby = currentupdatingcreature;
