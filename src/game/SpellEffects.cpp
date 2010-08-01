@@ -4563,7 +4563,7 @@ void Spell::EffectHealMaxHealth(uint32 /*i*/)
         m_originalCaster->SendHealSpellLog(unitTarget, m_spellInfo->Id, addhealth, false);
 }
 
-void Spell::EffectInterruptCast(uint32 i)
+void Spell::EffectInterruptCast(uint32 j)
 {
     if(!unitTarget)
         return;
@@ -4581,7 +4581,7 @@ void Spell::EffectInterruptCast(uint32 i)
             {
                 if(m_originalCaster)
                 {
-                    int32 duration = m_originalCaster->CalculateSpellDuration(m_spellInfo, i, unitTarget);
+                    int32 duration = m_originalCaster->CalculateSpellDuration(m_spellInfo, j, unitTarget);
                     unitTarget->ProhibitSpellScholl(GetSpellSchoolMask(unitTarget->m_currentSpells[i]->m_spellInfo), duration/*GetSpellDuration(m_spellInfo)*/);
                 }
                 unitTarget->InterruptSpell(i,false);
