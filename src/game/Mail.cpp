@@ -266,7 +266,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
     sLog.outMail("\tItems: ");
     for ( std::map<uint32,MailItem>::iterator it = mi.begin(); it != mi.end(); it++)
     {
-      sLog.outMail("\t\t[%s]",(*it).second.item->GetProto()->Name1);
+      sLog.outMail("\t\t[%s]x%d",(*it).second.item->GetProto()->Name1,(*it).second.item->GetCount());
     }
     //sLog.outMail("\tBody: "); // TODO: Da verificare se è legale in Italia
     //sLog.outMail("%s",body.c_str());
