@@ -15,6 +15,7 @@ src/mangosd/
 src/realmd/
 src/trinitycore/trinity-core
 src/trinityrealm/trinity-realm
+cmake_uninstall.cmake
 *.*-*
 *.o
 *.a
