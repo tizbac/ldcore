@@ -1,5 +1,5 @@
-include_directories( ../boost_1_42_0/ ../luabind-0.9 ../lua5.1/src)
-link_directories( ../luabind-0.9 ../lua5.1/lib/Linux26g4_64)
+include_directories( ../../../dep/boost_1_42_0/ ../../../dep/luabind-0.9 ../../../dep/lua5.1/src)
+link_directories( ../../../dep/luabind-0.9 ../../../dep/lua5.1)
 
 ########### next target ###############
 
@@ -411,7 +411,7 @@ IF (CMAKE_SYSTEM_NAME MATCHES "Darwin")
     SET_TARGET_PROPERTIES(trinityscript PROPERTIES LINK_FLAGS "-flat_namespace -undefined suppress")
 ENDIF (CMAKE_SYSTEM_NAME MATCHES "Darwin")
 
-target_link_libraries(trinityscript lua5.1 luabind)
+target_link_libraries(trinityscript trinitylua trinityluabind)
 
 set_target_properties(trinityscript PROPERTIES VERSION 4.2.0 SOVERSION 4)
 install(TARGETS trinityscript DESTINATION lib)
