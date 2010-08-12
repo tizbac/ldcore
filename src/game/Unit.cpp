@@ -8507,7 +8507,7 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
         spellProto->Id == 27817 || spellProto->Id == 27818 )
         fixedAmount = true;
 
-    if(spellProto->Id == 379)
+    if(spellProto->Id == 379 || spellProto->Id == 33110)
     {
         fixedAmount = true;
         healingReduction = false;
