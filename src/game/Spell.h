@@ -434,7 +434,8 @@ class Spell
         bool IsNeedSendToClient() const;
 
         CurrentSpellTypes GetCurrentContainer();
-
+	  
+	  Unit* GetUnitTarget() const { return unitTarget; }
         Unit* GetCaster() const { return m_caster; }
         Unit* GetOriginalCaster() const { return m_originalCaster; }
         int32 GetPowerCost() const { return m_powerCost; }

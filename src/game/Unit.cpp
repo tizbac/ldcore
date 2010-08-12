@@ -5234,6 +5234,14 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, uint32 cleanDamage,
                     target = SelectNearbyTarget();
                     if(!target)
                         return false;
+                    
+                    //Cleave hack-fix
+                    if(procSpell->SpellFamilyFlags & 0x000400000LL && procSpell->SpellFamilyName == SPELLFAMILY_WARRIOR)
+                    {
+                    	Unit * pTarget = m_currentSpells[CURRENT_MELEE_SPELL]->GetUnitTarget();
+                    	if(pTarget && target == pTarget && target != getVictim())
+                    		target = getVictim();
+                    }
 
                     triggered_spell_id = 12723;
                     basepoints0 = damage + cleanDamage;
