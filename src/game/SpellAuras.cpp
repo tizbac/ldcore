@@ -629,6 +629,12 @@ void Aura::Update(uint32 diff)
             return;
     }
 
+	  if(m_isPersistent)
+	  {
+		if (m_periodicTimer == 0)
+		    PersistentAuraTrigger();
+	  }
+
     if(m_isPeriodic && (m_duration >= 0 || m_isPassive || m_permanent))
     {
         m_periodicTimer -= diff;
@@ -646,6 +652,10 @@ void Aura::Update(uint32 diff)
                 ApplyModifier(true);
                 return;
             }
+            
+            if(m_isPersistent)
+			PersistentAuraTrigger();
+
             // update before applying (aura can be removed in TriggerSpell or PeriodicTick calls)
             m_periodicTimer += m_amplitude;//m_modifier.periodictime;
 
@@ -6506,6 +6516,32 @@ void Aura::PeriodicDummyTick()
         default:
             break;
     }
+}
+
+void Aura::PersistentAuraTrigger()
+{
+    if(!m_target->isAlive())
+        return;
+
+	Unit* caster = GetCaster();
+
+	if(!caster)
+		return;
+
+	//Frost Trap Aura Trigger
+	if(m_spellProto->Id == 13810)
+	{
+		uint32 procAttacker = PROC_FLAG_ON_TRAP_ACTIVATION;
+		uint32 procVictim = PROC_FLAG_NONE;
+		uint32 procEx = PROC_EX_NORMAL_HIT;
+		
+		if( (!m_isPeriodic && m_periodicTimer == 0) || (m_isPeriodic && m_periodicTimer <= 0) )
+		{
+			caster->ProcDamageAndSpell(m_target, procAttacker, procVictim, procEx, 0, 0, BASE_ATTACK, m_spellProto );
+			if(!m_isPeriodic)
+			     m_periodicTimer -= 100;
+		}
+	}
 }
 
 void Aura::HandlePreventFleeing(bool apply, bool Real)

@@ -297,6 +297,8 @@ class TRINITY_DLL_SPEC Aura
         void _RemoveAura();
 
         void TriggerSpell();
+        
+        void PersistentAuraTrigger();
 
         bool IsUpdated() { return m_updated; }
         void SetUpdated(bool val) { m_updated = val; }
