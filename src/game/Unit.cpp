@@ -634,7 +634,7 @@ void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except)
 
         //sLog.outDetail("auraflag:%u flag:%u = %u", aur->GetSpellProto()->AuraInterruptFlags,flag, aur->GetSpellProto()->AuraInterruptFlags & flag);
 
-        if(aur && (aur->GetSpellProto()->AuraInterruptFlags & flag))
+        if(aur && (aur->GetSpellProto()->AuraInterruptFlags & flag) && except != 33619)
         {
             if(aur->IsInUse())
                 sLog.outError("Aura %u is trying to remove itself! Flag %u. May cause crash!", aur->GetId(), flag);
