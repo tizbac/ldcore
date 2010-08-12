@@ -1,5 +1,5 @@
-include_directories( ../bindings/boost_1_42_0/ ../bindings/luabind-0.9 ../bindings/lua5.1/src)
-link_directories( ../bindings/luabind-0.9 ../bindings/lua5.1/lib/Linux26g4_64)
+include_directories( ../../dep/boost_1_42_0/ ../../dep/luabind-0.9 ../../dep/lua5.1/src)
+link_directories( ../../dep/luabind-0.9 ../../dep/lua5.1)
 
 ########### next target ###############
 
@@ -46,8 +46,8 @@ trinitysockets
 trinitydatabase
 trinityauth
 trinityconfig
-lua5.1
-luabind
+trinitylua
+trinityluabind
 vmaps
 ZThread
 g3dlite
