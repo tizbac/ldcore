@@ -5240,7 +5240,11 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, uint32 cleanDamage,
                     {
                     	Unit * pTarget = m_currentSpells[CURRENT_MELEE_SPELL]->GetUnitTarget();
                     	if(pTarget && target == pTarget && target != getVictim())
+                    	{
                     		target = getVictim();
+                    		if(!target)
+                        	     return false;
+                        }
                     }
 
                     triggered_spell_id = 12723;
