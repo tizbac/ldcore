@@ -5236,6 +5236,8 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, uint32 cleanDamage,
                         return false;
                     
                     //Cleave hack-fix
+                    if (!procSpell)
+                        return false;
                     if(procSpell->SpellFamilyFlags & 0x000400000LL && procSpell->SpellFamilyName == SPELLFAMILY_WARRIOR)
                     {
                     	Unit * pTarget = m_currentSpells[CURRENT_MELEE_SPELL]->GetUnitTarget();
