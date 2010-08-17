@@ -540,7 +540,7 @@ uint32 ArenaTeam::GetPoints(uint32 MemberRating)
     else if(Type == ARENA_TEAM_3v3)
         points *= 0.88f;
 
-    return (uint32) (points);
+    return ((uint32) (points))*2;
 }
 
 float ArenaTeam::GetChanceAgainst(uint32 own_rating, uint32 enemy_rating)
