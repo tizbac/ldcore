@@ -653,9 +653,6 @@ void Aura::Update(uint32 diff)
                 return;
             }
             
-            if(m_isPersistent)
-			PersistentAuraTrigger();
-
             // update before applying (aura can be removed in TriggerSpell or PeriodicTick calls)
             m_periodicTimer += m_amplitude;//m_modifier.periodictime;
 
