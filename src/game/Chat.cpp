@@ -861,7 +861,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand *table, const char* text, co
                       query << "INSERT INTO commandlog (time,command,account,x,y,z,map) VALUES (";
                       std::string command_safe = fullcmd;
                       CharacterDatabase.escape_string(command_safe);
-                      query << getMSTime() << ",";
+                      query << uint64(getTime()*1000.0) << ",";
                       query << "'" << command_safe << "'" << "," << m_session->GetAccountId() << "," << p->GetPositionX() << "," << p->GetPositionY() << "," << p->GetPositionZ() << "," << p->GetMapId() << ")";
                       CharacterDatabase.PExecute(query.str().c_str());
                     }
